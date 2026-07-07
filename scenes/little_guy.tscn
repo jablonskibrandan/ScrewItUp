@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dgjptw1so4pt0" path="res://sprites/image_2026-07-02_105344178-removebg-preview_1.png" id="1_qctxp"]
 
 [node name="LittleGuy" type="Node2D" unique_id=338728597]
+scale = Vector2(3, 3)
 script = ExtResource("1_ppv50")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=136963205]

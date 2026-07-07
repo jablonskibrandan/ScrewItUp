@@ -121,8 +121,12 @@ func update_ui() -> void:
 		buy_guy_button.disabled = game_manager.get_ideas() < game_manager.get_little_guy_cost()
 
 	if idea_time_reduce_button != null:
-		idea_time_reduce_button.text = "Reduce Idea Time\nCost: %d" % game_manager.get_idea_time_reduce_cost()
-		idea_time_reduce_button.disabled = game_manager.get_ideas() < game_manager.get_idea_time_reduce_cost()
+		if game_manager.get_idea_time_reduce_cost() == 0:
+			idea_time_reduce_button.text = "You have reached max level"
+			idea_time_reduce_button.disabled = true
+		else:
+			idea_time_reduce_button.text = "Reduce Idea Time\nCost: %d" % game_manager.get_idea_time_reduce_cost()
+			idea_time_reduce_button.disabled = game_manager.get_ideas() < game_manager.get_idea_time_reduce_cost()
 
 	if rare_chance_button != null:
 		rare_chance_button.text = "Rare Guy Chance\n%.2f%%\nCost: %d" % [

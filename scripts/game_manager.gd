@@ -20,7 +20,7 @@ var bright_ideas: int = 0
 # Game starts with 1 little guy.
 var amt_little_guys: int = 1
 
-var idea_production_time: float = 5.0
+var idea_production_time: float = 1
 var idea_time_reduce_amount: float = 0.25
 var min_idea_production_time: float = 0.5
 
@@ -87,6 +87,8 @@ func get_little_guy_cost() -> int:
 
 
 func get_idea_time_reduce_cost() -> int:
+	if idea_production_time == 0.5:
+		return 0
 	return max(1, int(floor(idea_time_reduce_raw_cost)))
 
 
@@ -156,7 +158,8 @@ func try_pay_for_little_guy() -> bool:
 
 func try_buy_idea_time_reduce() -> bool:
 	var cost := get_idea_time_reduce_cost()
-
+	if cost == 0:
+		return false
 	if not spend_ideas(cost):
 		return false
 
