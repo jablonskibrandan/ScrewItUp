@@ -14,6 +14,8 @@ extends Node
 @export var little_guys_label: Label
 @export var idea_time_label: Label
 
+@export var button_click_sfx: AudioStreamPlayer
+
 
 func _ready() -> void:
 	if spawner == null:
@@ -56,6 +58,7 @@ func _ready() -> void:
 
 
 func on_buy_guy_pressed() -> void:
+	play_button_sfx()
 	if game_manager.try_buy_little_guy():
 		spawner.add_guy_to_stack()
 
@@ -68,6 +71,7 @@ func on_idea_time_reduce_pressed() -> void:
 
 
 func on_rare_chance_pressed() -> void:
+	play_button_sfx()
 	game_manager.try_buy_rare_chance()
 	update_ui()
 
@@ -101,6 +105,11 @@ func on_bright_idea_unlocked() -> void:
 		bright_chance_button.visible = true
 
 	update_ui()
+	
+	
+func play_button_sfx() -> void:
+	if button_click_sfx != null:
+		button_click_sfx.play()
 
 
 func update_ui() -> void:

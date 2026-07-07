@@ -15,6 +15,8 @@ class_name Spawner
 @export var game_manager: GameManager
 @export var camera_controller: CameraController
 
+var next_stack_index: int = 0
+
 var stack_base_position: Vector2
 var spawn_position: Vector2
 
@@ -58,31 +60,34 @@ func add_guy_to_stack() -> void:
 		push_error("Little Guy Scene is not assigned.")
 		return
 
-	if stack_root == null:
-		push_error("Stack Root is not assigned.")
-		return
-
-	if game_manager == null:
-		push_error("Game Manager is not assigned.")
-		return
-
-	var current_amount := game_manager.get_amt_little_guys()
-	var stack_index := current_amount
+	var stack_index := next_stack_index
 
 	var guy := little_guy_scene.instantiate() as Node2D
 	stack_root.add_child(guy)
+
+	var is_rare := false
+
+	if game_manager != null:
+		is_rare = game_manager.roll_for_rare_guy()
+
+		if is_rare:
+			game_manager.mark_rare_guy_found()
+
+	if guy.has_method("setup"):
+		guy.setup(is_rare)
+	
+	if guy.has_method("play_pop_sfx"):
+		guy.play_pop_sfx()
 
 	var target_position := get_stack_position(stack_index)
 
 	guy.global_position = spawn_position
 	guy.z_index = 100 + stack_index
 
-	game_manager.set_amt_little_guys(current_amount + 1)
+	next_stack_index += 1
 
-	print("Spawn position: ", spawn_position)
-	print("Target position: ", target_position)
-	print("Current camera: ", get_viewport().get_camera_2d().global_position)
-	print("Stack children: ", stack_root.get_child_count())
+	if game_manager != null:
+		game_manager.set_amt_little_guys(next_stack_index)
 
 	jump_guy_to_position(guy, target_position)
 
@@ -92,20 +97,21 @@ func add_starting_guy() -> void:
 		push_error("Little Guy Scene is not assigned.")
 		return
 
-	if stack_root == null:
-		push_error("Stack Root is not assigned.")
-		return
-
 	var guy := little_guy_scene.instantiate() as Node2D
 	stack_root.add_child(guy)
 
-	var target_position := get_stack_position(0)
+	var target_position := get_stack_position(next_stack_index)
+
+	if guy.has_method("setup"):
+		guy.setup(false)
 
 	guy.global_position = target_position
-	guy.z_index = 100
+	guy.z_index = 100 + next_stack_index
 
-	if game_manager != null and game_manager.get_amt_little_guys() < 1:
-		game_manager.set_amt_little_guys(1)
+	next_stack_index += 1
+
+	if game_manager != null:
+		game_manager.set_amt_little_guys(next_stack_index)
 
 	print("Starting guy added at: ", target_position)
 

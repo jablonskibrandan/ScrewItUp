@@ -2,11 +2,23 @@
 
 [ext_resource type="Script" uid="uid://ssaddaxeue2y" path="res://scripts/little_guy.gd" id="1_ppv50"]
 [ext_resource type="Texture2D" uid="uid://dgjptw1so4pt0" path="res://sprites/image_2026-07-02_105344178-removebg-preview_1.png" id="1_qctxp"]
+[ext_resource type="AudioStream" uid="uid://dmmooaawenh4j" path="res://audio/little_guy_pop.mp3" id="3_25crj"]
+[ext_resource type="AudioStream" uid="uid://c887vdtlrb3jf" path="res://audio/rare_guy_pop.mp3" id="4_oghk0"]
 
-[node name="LittleGuy" type="Node2D" unique_id=338728597]
+[node name="LittleGuy" type="Node2D" unique_id=338728597 node_paths=PackedStringArray("little_guy_pop", "rare_guy_pop")]
 scale = Vector2(3, 3)
 script = ExtResource("1_ppv50")
+little_guy_pop = NodePath("Audio/LittleGuyPop")
+rare_guy_pop = NodePath("Audio/RareGuyPop")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=136963205]
 scale = Vector2(0.025, 0.025)
 texture = ExtResource("1_qctxp")
+
+[node name="Audio" type="Node" parent="." unique_id=854340812]
+
+[node name="LittleGuyPop" type="AudioStreamPlayer" parent="Audio" unique_id=1446521249]
+stream = ExtResource("3_25crj")
+
+[node name="RareGuyPop" type="AudioStreamPlayer" parent="Audio" unique_id=2114455650]
+stream = ExtResource("4_oghk0")
