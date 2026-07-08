@@ -15,7 +15,7 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Screw It Up"
-run/main_scene="res://scenes/Main.tscn"
+run/main_scene="uid://cjf0np2jymnl6"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://assets/little_guy.png"
 

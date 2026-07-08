@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://cjf0np2jymnl6"]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_main"]
+[ext_resource type="Texture2D" path="res://sprites/screwitup-title-screen-pixilart_4.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://sprites/menu_title_cropped.png" id="3_title"]
+[ext_resource type="Script" path="res://scripts/texture_whimsy.gd" id="4_sway"]
+[ext_resource type="Texture2D" path="res://sprites/start_button_cropped.png" id="5_start"]
+[ext_resource type="Texture2D" path="res://sprites/start_button_focus.png" id="6_start_focus"]
+[ext_resource type="Texture2D" path="res://sprites/quit_button_cropped.png" id="7_quit"]
+[ext_resource type="Texture2D" path="res://sprites/quit_button_focus.png" id="8_quit_focus"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main")
+
+[node name="TitleBackground" type="TextureRect" parent="."]
+z_index = -10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -420.0
+offset_top = 70.0
+offset_right = 420.0
+offset_bottom = 680.0
+grow_horizontal = 2
+theme_override_constants/separation = 24
+alignment = 0
+
+[node name="TitleImage" type="TextureRect" parent="VBoxContainer"]
+custom_minimum_size = Vector2(650, 180)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+texture = ExtResource("3_title")
+expand_mode = 1
+stretch_mode = 5
+script = ExtResource("4_sway")
+sway_degrees = 3.5
+sway_speed = 0.45
+
+[node name="PlayButton" type="TextureButton" parent="VBoxContainer"]
+z_index = 20
+custom_minimum_size = Vector2(300, 95)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+focus_mode = 2
+mouse_filter = 0
+ignore_texture_size = true
+stretch_mode = 5
+texture_normal = ExtResource("5_start")
+texture_pressed = ExtResource("6_start_focus")
+texture_hover = ExtResource("6_start_focus")
+texture_focused = ExtResource("6_start_focus")
+
+[node name="QuitButton" type="TextureButton" parent="VBoxContainer"]
+z_index = 20
+custom_minimum_size = Vector2(260, 95)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+focus_mode = 2
+mouse_filter = 0
+ignore_texture_size = true
+stretch_mode = 5
+texture_normal = ExtResource("7_quit")
+texture_pressed = ExtResource("8_quit_focus")
+texture_hover = ExtResource("8_quit_focus")
+texture_focused = ExtResource("8_quit_focus")

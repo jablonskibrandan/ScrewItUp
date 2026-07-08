@@ -59,10 +59,8 @@ guy_spawn_point = NodePath("../SpawnPoint")
 game_manager = NodePath("../../GameManager")
 camera_controller = NodePath("../Camera2D")
 
-[node name="LittleGuy" parent="World" unique_id=338728597 node_paths=PackedStringArray("little_guy_pop", "rare_guy_pop") instance=ExtResource("3_tbgi4")]
+[node name="LittleGuy" parent="World" unique_id=338728597 instance=ExtResource("3_tbgi4")]
 position = Vector2(475, 638)
-little_guy_pop = NodePath("")
-rare_guy_pop = NodePath("")
 
 [node name="ScreenUI" type="CanvasLayer" parent="." unique_id=1507895780 node_paths=PackedStringArray("spawner", "game_manager", "buy_guy_button", "idea_time_reduce_button", "rare_chance_button", "bright_chance_button", "ideas_label", "bright_ideas_label", "little_guys_label", "idea_time_label", "button_click_sfx")]
 layer = 10
