@@ -2,7 +2,9 @@ extends Node
 class_name GameManager
 
 signal ideas_changed(ideas: int)
+signal ideas_added
 signal bright_ideas_changed(bright_ideas: int)
+signal bright_ideas_added
 signal costs_changed
 
 signal little_guy_purchased
@@ -14,17 +16,18 @@ signal rare_guy_unlocked
 signal bright_idea_unlocked
 
 
-var ideas: int = 0
+var ideas: int = 10
 var bright_ideas: int = 0
 
 # Game starts with 1 little guy.
 var amt_little_guys: int = 1
 
-var idea_production_time: float = 1
+var idea_production_time: float = 0.75
+
 var idea_time_reduce_amount: float = 0.25
 var min_idea_production_time: float = 0.5
 
-var bright_idea_chance: float = 0.01
+var bright_idea_chance: float = 0.1
 var bright_idea_chance_increase: float = 0.005
 
 var rare_guy_chance: float = 0.01
@@ -42,7 +45,8 @@ var production_timer: float = 0.0
 var rare_little_guys: int = 0
 
 const COST_MULTIPLIER: float = 1.25
-
+func _ready() -> void:
+	add_to_group("game_manager")
 func _process(delta: float) -> void:
 	if amt_little_guys <= 0:
 		return
@@ -128,12 +132,12 @@ func spend_ideas(cost: int) -> bool:
 func add_ideas(amount: int) -> void:
 	ideas += amount
 	ideas_changed.emit(ideas)
-
+	ideas_added.emit()
 
 func add_bright_ideas(amount: int) -> void:
 	bright_ideas += amount
 	bright_ideas_changed.emit(bright_ideas)
-
+	bright_ideas_added.emit()
 	if not has_found_bright_idea and bright_ideas > 0:
 		has_found_bright_idea = true
 		bright_idea_unlocked.emit()

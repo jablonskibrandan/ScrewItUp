@@ -19,6 +19,10 @@ run/main_scene="uid://cjf0np2jymnl6"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://assets/little_guy.png"
 
+[autoload]
+
+ManagerCommunication="*uid://bcjynfe8vm2sh"
+
 [display]
 
 window/size/viewport_width=1920

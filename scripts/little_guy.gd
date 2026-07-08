@@ -1,13 +1,15 @@
 extends Node2D
-
 @onready var sprite: Sprite2D = $Sprite2D
-
+const idea_lamp = preload("uid://ketwc3ehaks2")
+const bright_idea_lamp= preload("uid://cfurqvmpb1o65")
 var is_rare: bool = false
-
 @export var little_guy_pop: AudioStreamPlayer
 @export var rare_guy_pop: AudioStreamPlayer
 @export var pop_sfx_delay: float = 0.35
 
+func _ready() -> void:
+	ManagerCommunication.little_guy_idea_lamp.connect(on_idea_lamp)
+	ManagerCommunication.little_guy_bright_idea_lamp.connect(on_bright_idea_lamp)
 func setup(rare: bool) -> void:
 	is_rare = rare
 
@@ -65,3 +67,26 @@ func _bezier(a: Vector2, b: Vector2, c: Vector2, t: float) -> Vector2:
 	var ab := a.lerp(b, t)
 	var bc := b.lerp(c, t)
 	return ab.lerp(bc, t)
+func _spawn_lamp(texture: Texture2D) -> void:
+	var lamp_sprite := Sprite2D.new()
+	lamp_sprite.texture = texture
+	if texture == idea_lamp:
+		lamp_sprite.position = position + Vector2(23, -10)
+	elif texture == bright_idea_lamp:
+		lamp_sprite.position = position + Vector2(-23, -10)
+	lamp_sprite.scale = Vector2(0.03, 0.03)
+	get_parent().add_child(lamp_sprite)
+
+	var tween := create_tween()
+	tween.tween_property(lamp_sprite, "modulate:a", 0.0, 0.6) \
+		.set_trans(Tween.TRANS_SINE) \
+		.set_ease(Tween.EASE_IN)
+	tween.tween_callback(lamp_sprite.queue_free)
+
+
+func on_idea_lamp() -> void:
+	_spawn_lamp(idea_lamp)
+
+
+func on_bright_idea_lamp() -> void:
+	_spawn_lamp(bright_idea_lamp)
