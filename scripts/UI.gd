@@ -126,7 +126,8 @@ func update_ui() -> void:
 		idea_time_label.text = "Idea Time: %.2fs" % game_manager.idea_production_time
 
 	if buy_guy_button != null:
-		buy_guy_button.text = "Buy Little Guy\nCost: %d" % game_manager.get_little_guy_cost()
+		#counter here 
+		buy_guy_button.text = "%d\rcost:%d"%[game_manager.little_guy_counter,game_manager.get_little_guy_cost()]
 		buy_guy_button.disabled = game_manager.get_ideas() < game_manager.get_little_guy_cost()
 
 	if idea_time_reduce_button != null:

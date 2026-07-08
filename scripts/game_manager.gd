@@ -6,7 +6,6 @@ signal ideas_added
 signal bright_ideas_changed(bright_ideas: int)
 signal bright_ideas_added
 signal costs_changed
-
 signal little_guy_purchased
 signal idea_time_reduce_purchased
 signal rare_chance_purchased
@@ -15,7 +14,7 @@ signal bright_chance_purchased
 signal rare_guy_unlocked
 signal bright_idea_unlocked
 
-
+var little_guy_counter : int = 1
 var ideas: int = 0
 var bright_ideas: int = 0
 
@@ -159,6 +158,7 @@ func try_buy_little_guy() -> bool:
 	little_guy_raw_cost *= COST_MULTIPLIER
 
 	little_guy_purchased.emit()
+	little_guy_counter += 1
 	costs_changed.emit()
 
 	return true
