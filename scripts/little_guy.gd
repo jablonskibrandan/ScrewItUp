@@ -1,15 +1,30 @@
 extends Node2D
+
 @onready var sprite: Sprite2D = $Sprite2D
-const idea_lamp = preload("uid://ketwc3ehaks2")
-const bright_idea_lamp= preload("uid://cfurqvmpb1o65")
+
+const idea_lamp: Texture2D = preload("uid://ketwc3ehaks2")
+const bright_idea_lamp: Texture2D = preload("uid://cfurqvmpb1o65")
+
 var is_rare: bool = false
+
 @export var little_guy_pop: AudioStreamPlayer
 @export var rare_guy_pop: AudioStreamPlayer
 @export var pop_sfx_delay: float = 0.35
 
+
 func _ready() -> void:
-	ManagerCommunication.little_guy_idea_lamp.connect(on_idea_lamp)
-	ManagerCommunication.little_guy_bright_idea_lamp.connect(on_bright_idea_lamp)
+	print("LittleGuy ready: ", name)
+
+	var idea_callable := Callable(self, "on_idea_lamp")
+	var bright_callable := Callable(self, "on_bright_idea_lamp")
+
+	if not ManagerCommunication.little_guy_idea_lamp.is_connected(idea_callable):
+		ManagerCommunication.little_guy_idea_lamp.connect(idea_callable)
+
+	if not ManagerCommunication.little_guy_bright_idea_lamp.is_connected(bright_callable):
+		ManagerCommunication.little_guy_bright_idea_lamp.connect(bright_callable)
+
+
 func setup(rare: bool) -> void:
 	is_rare = rare
 
@@ -19,74 +34,67 @@ func setup(rare: bool) -> void:
 		sprite.modulate = Color.WHITE
 
 
-func play_pop_sfx() -> void:
-	#Otherwise we play right away which doesn't feel right.
-	await get_tree().create_timer(pop_sfx_delay).timeout
-
-	var player: AudioStreamPlayer
-
-	if is_rare:
-		player = rare_guy_pop
-	else:
-		player = little_guy_pop
-
-	if player == null:
-		print("Pop sound player is null.")
+func _spawn_lamp(texture: Texture2D, is_bright: bool = false) -> void:
+	if texture == null:
 		return
 
-	if player.stream == null:
-		print("Pop sound player has no stream assigned.")
-		return
-
-	player.stop()
-	player.play()
-
-
-func jump_to_stack(target_position: Vector2) -> void:
-	var start_position := global_position
-	var peak_position := start_position.lerp(target_position, 0.5)
-	peak_position.y -= 180.0
-
-	var tween := create_tween()
-
-	tween.tween_method(
-		func(t: float):
-			global_position = _bezier(start_position, peak_position, target_position, t),
-		0.0,
-		1.0,
-		0.45
-	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-	
-	if is_rare:
-		rare_guy_pop.play()
-	else:
-		little_guy_pop.play()
-
-
-func _bezier(a: Vector2, b: Vector2, c: Vector2, t: float) -> Vector2:
-	var ab := a.lerp(b, t)
-	var bc := b.lerp(c, t)
-	return ab.lerp(bc, t)
-func _spawn_lamp(texture: Texture2D) -> void:
 	var lamp_sprite := Sprite2D.new()
 	lamp_sprite.texture = texture
-	if texture == idea_lamp:
-		lamp_sprite.position = position + Vector2(23, -10)
-	elif texture == bright_idea_lamp:
-		lamp_sprite.position = position + Vector2(-23, -10)
-	lamp_sprite.scale = Vector2(0.03, 0.03)
-	get_parent().add_child(lamp_sprite)
+	lamp_sprite.centered = true
 
-	var tween := create_tween()
-	tween.tween_property(lamp_sprite, "modulate:a", 0.0, 0.6) \
-		.set_trans(Tween.TRANS_SINE) \
-		.set_ease(Tween.EASE_IN)
+	# Slight variation so every lamp does not appear in the exact same spot.
+	var random_x := randf_range(-4.0, 4.0)
+	var random_y := randf_range(-3.0, 2.0)
+
+	# Put it directly above the little guy's head.
+	var head_offset := Vector2(random_x, -24.0 + random_y)
+	lamp_sprite.global_position = global_position + head_offset
+
+	# Make the lamp about the same visible height as the little guy.
+	if sprite.texture != null:
+		var little_guy_height := sprite.texture.get_height() * sprite.global_scale.y
+		var lamp_texture_height := texture.get_height()
+
+		if lamp_texture_height > 0:
+			var target_height := little_guy_height * randf_range(0.85, 1.1)
+			var lamp_scale := target_height / lamp_texture_height
+			lamp_sprite.global_scale = Vector2(lamp_scale, lamp_scale)
+	else:
+		lamp_sprite.global_scale = Vector2(0.25, 0.25)
+
+	# Slight visual variation.
+	lamp_sprite.rotation_degrees = randf_range(-8.0, 8.0)
+
+	# Make sure it appears in front.
+	lamp_sprite.z_as_relative = false
+	lamp_sprite.z_index = 1000
+
+	get_tree().current_scene.add_child(lamp_sprite)
+
+	var float_direction := Vector2(randf_range(-4.0, 4.0), -18.0)
+	var duration := randf_range(0.45, 0.7)
+
+	var tween := lamp_sprite.create_tween()
+	tween.tween_property(
+		lamp_sprite,
+		"global_position",
+		lamp_sprite.global_position + float_direction,
+		duration
+	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	tween.parallel().tween_property(
+		lamp_sprite,
+		"modulate:a",
+		0.0,
+		duration
+	).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
 	tween.tween_callback(lamp_sprite.queue_free)
 
 
 func on_idea_lamp() -> void:
-	_spawn_lamp(idea_lamp)
+	_spawn_lamp(idea_lamp, false)
 
 
 func on_bright_idea_lamp() -> void:
-	_spawn_lamp(bright_idea_lamp)
+	_spawn_lamp(bright_idea_lamp, true)

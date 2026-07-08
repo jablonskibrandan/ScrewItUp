@@ -16,18 +16,19 @@ signal rare_guy_unlocked
 signal bright_idea_unlocked
 
 
-var ideas: int = 10
+var ideas: int = 0
 var bright_ideas: int = 0
 
 # Game starts with 1 little guy.
+# Game starts with 1 little guy.
 var amt_little_guys: int = 1
 
-var idea_production_time: float = 0.75
+@export var idea_production_time: float = 5.0
 
 var idea_time_reduce_amount: float = 0.25
-var min_idea_production_time: float = 0.5
+var min_idea_production_time: float = 1.5
 
-var bright_idea_chance: float = 0.1
+var bright_idea_chance: float = 0.01
 var bright_idea_chance_increase: float = 0.005
 
 var rare_guy_chance: float = 0.01
@@ -45,8 +46,14 @@ var production_timer: float = 0.0
 var rare_little_guys: int = 0
 
 const COST_MULTIPLIER: float = 1.25
-func _ready() -> void:
+func _enter_tree() -> void:
 	add_to_group("game_manager")
+
+
+func _ready() -> void:
+	if ManagerCommunication.has_method("reconnect_to_game_manager"):
+		ManagerCommunication.reconnect_to_game_manager()
+		
 func _process(delta: float) -> void:
 	if amt_little_guys <= 0:
 		return
