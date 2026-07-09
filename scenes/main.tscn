@@ -72,7 +72,7 @@ scale = Vector2(2, 2)
 texture = ExtResource("1_o5qli")
 
 [node name="StackRoot" type="Node2D" parent="World" unique_id=1356934903]
-position = Vector2(476, 643)
+position = Vector2(475, 653)
 
 [node name="SpawnPoint" type="Marker2D" parent="World" unique_id=406115017]
 position = Vector2(476, 609)
@@ -86,7 +86,7 @@ script = ExtResource("2_tefeu")
 camera = NodePath(".")
 top_screen_margin = 100.0
 
-[node name="Spawner" type="Node" parent="World" unique_id=2015348169 node_paths=PackedStringArray("stack_root", "stack_base_point", "guy_spawn_point", "game_manager", "camera_controller")]
+[node name="Spawner" type="Node" parent="World" unique_id=2015348169 node_paths=PackedStringArray("stack_root", "stack_base_point", "guy_spawn_point", "starting_little_guy", "game_manager", "camera_controller")]
 script = ExtResource("2_jyhfs")
 little_guy_scene = ExtResource("3_tbgi4")
 guy_spacing_y = 32.0
@@ -94,6 +94,7 @@ stack_wobble_x = 5.0
 stack_root = NodePath("../StackRoot")
 stack_base_point = NodePath("../SpawnPoint")
 guy_spawn_point = NodePath("../SpawnPoint")
+starting_little_guy = NodePath("../LittleGuy")
 game_manager = NodePath("../../GameManager")
 camera_controller = NodePath("../Camera2D")
 

@@ -3,9 +3,12 @@ class_name GameManager
 
 signal ideas_changed(ideas: int)
 signal ideas_added
+
 signal bright_ideas_changed(bright_ideas: int)
 signal bright_ideas_added
+
 signal costs_changed
+
 signal little_guy_purchased
 signal idea_time_reduce_purchased
 signal rare_chance_purchased
@@ -14,13 +17,13 @@ signal bright_chance_purchased
 signal rare_guy_unlocked
 signal bright_idea_unlocked
 
-var little_guy_counter : int = 1
+
 var ideas: int = 0
 var bright_ideas: int = 0
 
-# Game starts with 1 little guy.
-# Game starts with 1 little guy.
+# Game starts with 1 little guy already existing in the scene.
 var amt_little_guys: int = 1
+var rare_little_guys: int = 0
 
 @export var idea_production_time: float = 5.0
 
@@ -42,9 +45,11 @@ var rare_chance_raw_cost: float = 50.0
 var bright_chance_raw_cost: float = 50.0
 
 var production_timer: float = 0.0
-var rare_little_guys: int = 0
 
 const COST_MULTIPLIER: float = 1.25
+const BRIGHT_IDEA_VALUE: int = 5
+
+
 func _enter_tree() -> void:
 	add_to_group("game_manager")
 
@@ -52,7 +57,8 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	if ManagerCommunication.has_method("reconnect_to_game_manager"):
 		ManagerCommunication.reconnect_to_game_manager()
-		
+
+
 func _process(delta: float) -> void:
 	if amt_little_guys <= 0:
 		return
@@ -65,17 +71,24 @@ func _process(delta: float) -> void:
 
 
 func produce_from_little_guys() -> void:
-	var normal_little_guys = max(0, amt_little_guys - rare_little_guys)
+	var normal_little_guys: int = max(0, amt_little_guys - rare_little_guys)
 
-	if normal_little_guys > 0:
-		add_ideas(normal_little_guys)
-
-	if rare_little_guys > 0:
-		add_bright_ideas(rare_little_guys)
-
+	var random_bright_ideas: int = 0
 	if roll_for_bright_idea():
-		add_bright_ideas(1)
-	
+		random_bright_ideas = 1
+
+	# Rare guys always produce bright ideas.
+	var total_bright_ideas: int = rare_little_guys + random_bright_ideas
+
+	# Normal guys still produce regular ideas.
+	# If a bright idea happened this cycle, do not also show the normal idea lamp.
+	if normal_little_guys > 0:
+		add_ideas(normal_little_guys, total_bright_ideas == 0)
+
+	if total_bright_ideas > 0:
+		add_bright_ideas(total_bright_ideas)
+
+
 func get_ideas() -> int:
 	return ideas
 
@@ -92,13 +105,22 @@ func set_amt_little_guys(amt: int) -> void:
 	amt_little_guys = max(0, amt)
 
 
+func add_little_guy_count(is_rare: bool = false) -> void:
+	amt_little_guys += 1
+
+	if is_rare:
+		rare_little_guys += 1
+		mark_rare_guy_found()
+
+
 func get_little_guy_cost() -> int:
 	return max(1, int(floor(little_guy_raw_cost)))
 
 
 func get_idea_time_reduce_cost() -> int:
-	if idea_production_time == 0.5:
+	if idea_production_time <= min_idea_production_time:
 		return 0
+
 	return max(1, int(floor(idea_time_reduce_raw_cost)))
 
 
@@ -132,18 +154,32 @@ func spend_ideas(cost: int) -> bool:
 
 	ideas -= cost
 	ideas_changed.emit(ideas)
+
 	return true
 
 
-func add_ideas(amount: int) -> void:
+func add_ideas(amount: int, emit_lamp: bool = true) -> void:
+	if amount <= 0:
+		return
+
 	ideas += amount
 	ideas_changed.emit(ideas)
-	ideas_added.emit()
+
+	if emit_lamp:
+		ideas_added.emit()
+
 
 func add_bright_ideas(amount: int) -> void:
+	if amount <= 0:
+		return
+
 	bright_ideas += amount
 	bright_ideas_changed.emit(bright_ideas)
+
+	add_ideas(amount * BRIGHT_IDEA_VALUE, false)
+
 	bright_ideas_added.emit()
+
 	if not has_found_bright_idea and bright_ideas > 0:
 		has_found_bright_idea = true
 		bright_idea_unlocked.emit()
@@ -157,11 +193,13 @@ func try_buy_little_guy() -> bool:
 
 	little_guy_raw_cost *= COST_MULTIPLIER
 
+	# Do NOT increase amt_little_guys here.
+	# The Spawner does that after it knows whether the new guy is rare.
 	little_guy_purchased.emit()
-	little_guy_counter += 1
 	costs_changed.emit()
 
 	return true
+
 
 func try_pay_for_little_guy() -> bool:
 	return try_buy_little_guy()
@@ -169,8 +207,10 @@ func try_pay_for_little_guy() -> bool:
 
 func try_buy_idea_time_reduce() -> bool:
 	var cost := get_idea_time_reduce_cost()
+
 	if cost == 0:
 		return false
+
 	if not spend_ideas(cost):
 		return false
 
@@ -185,6 +225,7 @@ func try_buy_idea_time_reduce() -> bool:
 	costs_changed.emit()
 
 	return true
+
 
 func try_buy_time_reduce() -> bool:
 	return try_buy_idea_time_reduce()

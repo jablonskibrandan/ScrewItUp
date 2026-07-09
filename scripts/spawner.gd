@@ -4,7 +4,7 @@ class_name Spawner
 @export var little_guy_scene: PackedScene
 
 @export var guy_spacing_y: float = 65.0
-@export var stack_wobble_x: float = 14.0
+@export var stack_wobble_x: float = 6.0
 @export var jump_height: float = 180.0
 @export var jump_time: float = 0.45
 
@@ -12,10 +12,16 @@ class_name Spawner
 @export var stack_base_point: Marker2D
 @export var guy_spawn_point: Marker2D
 
+# Assign the little guy that already exists when the game starts.
+# This makes the first bought guy stack directly above him.
+@export var starting_little_guy: Node2D
+
 @export var game_manager: GameManager
 @export var camera_controller: CameraController
 
-var next_stack_index: int = 0
+# Index 0 is the starting little guy.
+# First purchased little guy goes to index 1.
+var next_stack_index: int = 1
 
 var stack_base_position: Vector2
 var spawn_position: Vector2
@@ -31,10 +37,6 @@ func _ready() -> void:
 		push_error("Spawner needs Stack Root assigned.")
 		return
 
-	if stack_base_point == null:
-		push_error("Spawner needs Stack Base Point assigned.")
-		return
-
 	if guy_spawn_point == null:
 		push_error("Spawner needs Guy Spawn Point assigned.")
 		return
@@ -47,7 +49,14 @@ func _ready() -> void:
 		push_error("Spawner needs Camera Controller assigned.")
 		return
 
-	stack_base_position = stack_base_point.global_position
+	if starting_little_guy != null:
+		stack_base_position = starting_little_guy.global_position
+	elif stack_base_point != null:
+		stack_base_position = stack_base_point.global_position
+	else:
+		push_error("Spawner needs either Starting Little Guy or Stack Base Point assigned.")
+		return
+
 	spawn_position = guy_spawn_point.global_position
 
 	print("Spawner ready.")
@@ -70,12 +79,14 @@ func add_guy_to_stack() -> void:
 	if game_manager != null:
 		is_rare = game_manager.roll_for_rare_guy()
 
-		if is_rare:
-			game_manager.mark_rare_guy_found()
-
 	if guy.has_method("setup"):
 		guy.setup(is_rare)
-	
+
+	# This is where the new guy gets counted.
+	# It happens here because the Spawner knows whether the new guy is rare.
+	if game_manager != null:
+		game_manager.add_little_guy_count(is_rare)
+
 	if guy.has_method("play_pop_sfx"):
 		guy.play_pop_sfx()
 
@@ -86,9 +97,6 @@ func add_guy_to_stack() -> void:
 
 	next_stack_index += 1
 
-	if game_manager != null:
-		game_manager.set_amt_little_guys(next_stack_index)
-
 	jump_guy_to_position(guy, target_position)
 
 
@@ -97,21 +105,20 @@ func add_starting_guy() -> void:
 		push_error("Little Guy Scene is not assigned.")
 		return
 
+	var stack_index := 0
+
 	var guy := little_guy_scene.instantiate() as Node2D
 	stack_root.add_child(guy)
 
-	var target_position := get_stack_position(next_stack_index)
+	var target_position := get_stack_position(stack_index)
 
 	if guy.has_method("setup"):
 		guy.setup(false)
 
 	guy.global_position = target_position
-	guy.z_index = 100 + next_stack_index
+	guy.z_index = 100 + stack_index
 
-	next_stack_index += 1
-
-	if game_manager != null:
-		game_manager.set_amt_little_guys(next_stack_index)
+	next_stack_index = 1
 
 	print("Starting guy added at: ", target_position)
 

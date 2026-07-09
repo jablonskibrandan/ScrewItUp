@@ -24,7 +24,6 @@ func _ready() -> void:
 	play_button.pressed.connect(_on_play_pressed)
 	quit_button.pressed.connect(_on_quit_pressed)
 
-	# Controller/keyboard navigation should work, but START should not look selected immediately.
 	play_button.focus_neighbor_bottom = play_button.get_path_to(quit_button)
 	quit_button.focus_neighbor_top = quit_button.get_path_to(play_button)
 
