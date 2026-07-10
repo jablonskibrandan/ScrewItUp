@@ -98,3 +98,17 @@ func on_idea_lamp() -> void:
 
 func on_bright_idea_lamp() -> void:
 	_spawn_lamp(bright_idea_lamp, true)
+	
+func play_pop_sfx() -> void:
+	await get_tree().create_timer(pop_sfx_delay).timeout
+
+	if is_rare:
+		if rare_guy_pop != null:
+			rare_guy_pop.play()
+		else:
+			print("Rare guy pop sound is not assigned.")
+	else:
+		if little_guy_pop != null:
+			little_guy_pop.play()
+		else:
+			print("Little guy pop sound is not assigned.")

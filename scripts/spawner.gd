@@ -1,6 +1,8 @@
 extends Node
 class_name Spawner
 
+signal stack_progress_changed(progress: float)
+
 @export var little_guy_scene: PackedScene
 
 @export var guy_spacing_y: float = 65.0
@@ -11,6 +13,8 @@ class_name Spawner
 @export var stack_root: Node2D
 @export var stack_base_point: Marker2D
 @export var guy_spawn_point: Marker2D
+@export var progress_top_point: Marker2D
+@export var progress_goal_height: float = 1900.0
 
 # Assign the little guy that already exists when the game starts.
 # This makes the first bought guy stack directly above him.
@@ -25,6 +29,11 @@ var next_stack_index: int = 1
 
 var stack_base_position: Vector2
 var spawn_position: Vector2
+var highest_stack_y: float = 0.0
+
+
+func _enter_tree() -> void:
+	add_to_group("spawner")
 
 
 func _ready() -> void:
@@ -58,6 +67,8 @@ func _ready() -> void:
 		return
 
 	spawn_position = guy_spawn_point.global_position
+	highest_stack_y = stack_base_position.y
+	call_deferred("emit_stack_progress")
 
 	print("Spawner ready.")
 	print("Stack base position: ", stack_base_position)
@@ -119,6 +130,7 @@ func add_starting_guy() -> void:
 	guy.z_index = 100 + stack_index
 
 	next_stack_index = 1
+	register_stack_position(target_position)
 
 	print("Starting guy added at: ", target_position)
 
@@ -146,6 +158,7 @@ func jump_guy_to_position(guy: Node2D, target_position: Vector2) -> void:
 	tween.finished.connect(
 		func():
 			guy.global_position = target_position
+			register_stack_position(target_position)
 
 			if camera_controller != null:
 				camera_controller.check_camera_page_up(target_position)
@@ -157,6 +170,34 @@ func get_stack_position(index: int) -> Vector2:
 	var y := stack_base_position.y - index * guy_spacing_y
 
 	return Vector2(x, y)
+
+
+func register_stack_position(position: Vector2) -> void:
+	if highest_stack_y == 0.0 or position.y < highest_stack_y:
+		highest_stack_y = position.y
+
+	emit_stack_progress()
+
+
+func get_stack_progress() -> float:
+	var top_y: float
+
+	if progress_top_point != null:
+		top_y = progress_top_point.global_position.y
+	else:
+		top_y = stack_base_position.y - progress_goal_height
+
+	var total_height := stack_base_position.y - top_y
+
+	if total_height <= 0.0:
+		return 0.0
+
+	var climbed_height := stack_base_position.y - highest_stack_y
+	return clamp(climbed_height / total_height, 0.0, 1.0)
+
+
+func emit_stack_progress() -> void:
+	stack_progress_changed.emit(get_stack_progress())
 
 
 func quadratic_bezier(a: Vector2, b: Vector2, c: Vector2, t: float) -> Vector2:

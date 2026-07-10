@@ -14,11 +14,14 @@ signal idea_time_reduce_purchased
 signal rare_chance_purchased
 signal bright_chance_purchased
 
+signal auto_buyer_purchased
+signal auto_buy_speed_purchased
+
 signal rare_guy_unlocked
 signal bright_idea_unlocked
 
 
-var ideas: int = 0
+var ideas: int = 500
 var bright_ideas: int = 0
 
 # Game starts with 1 little guy already existing in the scene.
@@ -44,6 +47,16 @@ var idea_time_reduce_raw_cost: float = 5.0
 var rare_chance_raw_cost: float = 50.0
 var bright_chance_raw_cost: float = 50.0
 
+# Auto-buy upgrade.
+var has_auto_buyer: bool = false
+var auto_buy_unlock_raw_cost: float = 500.0
+var auto_buy_speed_raw_cost: float = 250.0
+
+var auto_buy_timer: float = 0.0
+var auto_buy_interval: float = 10.0
+var auto_buy_interval_reduce_amount: float = 1.0
+var min_auto_buy_interval: float = 3.0
+
 var production_timer: float = 0.0
 
 const COST_MULTIPLIER: float = 1.25
@@ -60,6 +73,11 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
+	_process_idea_production(delta)
+	_process_auto_buyer(delta)
+
+
+func _process_idea_production(delta: float) -> void:
 	if amt_little_guys <= 0:
 		return
 
@@ -68,6 +86,20 @@ func _process(delta: float) -> void:
 	if production_timer >= idea_production_time:
 		production_timer -= idea_production_time
 		produce_from_little_guys()
+
+
+func _process_auto_buyer(delta: float) -> void:
+	if not has_auto_buyer:
+		return
+
+	auto_buy_timer += delta
+
+	if auto_buy_timer >= auto_buy_interval:
+		auto_buy_timer -= auto_buy_interval
+
+		# Auto-buyer tries to buy one little guy.
+		# If you cannot afford it, nothing happens.
+		try_buy_little_guy()
 
 
 func produce_from_little_guys() -> void:
@@ -136,6 +168,27 @@ func get_bright_chance_cost() -> int:
 	return max(1, int(floor(bright_chance_raw_cost)))
 
 
+func get_auto_buyer_cost() -> int:
+	if has_auto_buyer:
+		return 0
+
+	return max(1, int(floor(auto_buy_unlock_raw_cost)))
+
+
+func get_auto_buy_speed_cost() -> int:
+	if not has_auto_buyer:
+		return 0
+
+	if auto_buy_interval <= min_auto_buy_interval:
+		return 0
+
+	return max(1, int(floor(auto_buy_speed_raw_cost)))
+
+
+func get_auto_buy_interval() -> float:
+	return auto_buy_interval
+
+
 func get_rare_guy_chance_percent() -> float:
 	return rare_guy_chance * 100.0
 
@@ -176,6 +229,7 @@ func add_bright_ideas(amount: int) -> void:
 	bright_ideas += amount
 	bright_ideas_changed.emit(bright_ideas)
 
+	# Each bright idea is worth 5 regular ideas.
 	add_ideas(amount * BRIGHT_IDEA_VALUE, false)
 
 	bright_ideas_added.emit()
@@ -256,6 +310,49 @@ func try_buy_bright_chance() -> bool:
 	bright_idea_chance += bright_idea_chance_increase
 
 	bright_chance_purchased.emit()
+	costs_changed.emit()
+
+	return true
+
+
+func try_buy_auto_buyer() -> bool:
+	if has_auto_buyer:
+		return false
+
+	var cost := get_auto_buyer_cost()
+
+	if not spend_ideas(cost):
+		return false
+
+	has_auto_buyer = true
+	auto_buy_timer = 0.0
+
+	auto_buyer_purchased.emit()
+	costs_changed.emit()
+
+	return true
+
+
+func try_buy_auto_buy_speed() -> bool:
+	if not has_auto_buyer:
+		return false
+
+	var cost := get_auto_buy_speed_cost()
+
+	if cost == 0:
+		return false
+
+	if not spend_ideas(cost):
+		return false
+
+	auto_buy_speed_raw_cost *= COST_MULTIPLIER
+
+	auto_buy_interval = max(
+		min_auto_buy_interval,
+		auto_buy_interval - auto_buy_interval_reduce_amount
+	)
+
+	auto_buy_speed_purchased.emit()
 	costs_changed.emit()
 
 	return true
