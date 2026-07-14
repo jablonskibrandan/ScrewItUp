@@ -1,7 +1,9 @@
 extends Node
 
-signal little_guy_idea_lamp
-signal little_guy_bright_idea_lamp
+# Lamp events now include the instance ID of the little guy that produced it.
+# Every LittleGuy still listens, but only the matching instance responds.
+signal little_guy_idea_lamp(producer_id: int)
+signal little_guy_bright_idea_lamp(producer_id: int)
 
 var game_manager: GameManager
 
@@ -18,24 +20,18 @@ func reconnect_to_game_manager() -> void:
 		return
 
 	game_manager = new_game_manager
-
-	var idea_callable := Callable(self, "on_idea_changed")
-	var bright_callable := Callable(self, "on_bright_idea_changed")
-
-	if not game_manager.ideas_added.is_connected(idea_callable):
-		game_manager.ideas_added.connect(idea_callable)
-
-	if not game_manager.bright_ideas_added.is_connected(bright_callable):
-		game_manager.bright_ideas_added.connect(bright_callable)
-
 	print("ManagerCommunication connected to GameManager")
 
 
-func on_idea_changed() -> void:
-	print("ManagerCommunication received idea signal")
-	little_guy_idea_lamp.emit()
+func show_idea_lamp(producer: Node) -> void:
+	if producer == null or not is_instance_valid(producer):
+		return
+
+	little_guy_idea_lamp.emit(producer.get_instance_id())
 
 
-func on_bright_idea_changed() -> void:
-	print("ManagerCommunication received bright idea signal")
-	little_guy_bright_idea_lamp.emit()
+func show_bright_idea_lamp(producer: Node) -> void:
+	if producer == null or not is_instance_valid(producer):
+		return
+
+	little_guy_bright_idea_lamp.emit(producer.get_instance_id())

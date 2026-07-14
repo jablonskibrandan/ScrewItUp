@@ -14,6 +14,7 @@ var is_rare: bool = false
 
 func _ready() -> void:
 	print("LittleGuy ready: ", name)
+	add_to_group("little_guys")
 
 	var idea_callable := Callable(self, "on_idea_lamp")
 	var bright_callable := Callable(self, "on_bright_idea_lamp")
@@ -46,7 +47,7 @@ func _spawn_lamp(texture: Texture2D, is_bright: bool = false) -> void:
 	var random_x := randf_range(-4.0, 4.0)
 	var random_y := randf_range(-3.0, 2.0)
 
-	# Put it directly above the little guy's head.
+	# Put it directly above this specific little guy's head.
 	var head_offset := Vector2(random_x, -24.0 + random_y)
 	lamp_sprite.global_position = global_position + head_offset
 
@@ -92,13 +93,22 @@ func _spawn_lamp(texture: Texture2D, is_bright: bool = false) -> void:
 	tween.tween_callback(lamp_sprite.queue_free)
 
 
-func on_idea_lamp() -> void:
+func on_idea_lamp(producer_id: int) -> void:
+	# Ignore lamp events intended for a different little guy.
+	if producer_id != get_instance_id():
+		return
+
 	_spawn_lamp(idea_lamp, false)
 
 
-func on_bright_idea_lamp() -> void:
+func on_bright_idea_lamp(producer_id: int) -> void:
+	# Ignore lamp events intended for a different little guy.
+	if producer_id != get_instance_id():
+		return
+
 	_spawn_lamp(bright_idea_lamp, true)
-	
+
+
 func play_pop_sfx() -> void:
 	await get_tree().create_timer(pop_sfx_delay).timeout
 

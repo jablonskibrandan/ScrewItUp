@@ -1,15 +1,58 @@
 [gd_scene format=3 uid="uid://cjf0np2jymnl6"]
 
-[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_main"]
-[ext_resource type="Texture2D" path="res://sprites/screwitup-title-screen-pixilart_4.png" id="2_bg"]
-[ext_resource type="Texture2D" path="res://sprites/menu_title_cropped.png" id="3_title"]
-[ext_resource type="Script" path="res://scripts/texture_whimsy.gd" id="4_sway"]
-[ext_resource type="Texture2D" path="res://sprites/start_button_cropped.png" id="5_start"]
-[ext_resource type="Texture2D" path="res://sprites/start_button_focus.png" id="6_start_focus"]
-[ext_resource type="Texture2D" path="res://sprites/quit_button_cropped.png" id="7_quit"]
-[ext_resource type="Texture2D" path="res://sprites/quit_button_focus.png" id="8_quit_focus"]
+[ext_resource type="Script" uid="uid://dh3onxncjbhal" path="res://scripts/main_menu.gd" id="1_main"]
+[ext_resource type="Texture2D" uid="uid://c8ggsg61udil4" path="res://sprites/pixilart-drawing_11-24x.png" id="2_5pajh"]
+[ext_resource type="Texture2D" uid="uid://cyvoht4ynqdhd" path="res://sprites/screwitup-title-screen-pixilart_4.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://btyaf14jr8lki" path="res://sprites/screwit-up-title-screen-animation_1.png" id="3_1ajci"]
+[ext_resource type="Texture2D" uid="uid://ci1bdmi28o1a" path="res://sprites/screwitup-credits-pixilart_1.png" id="3_a8gd2"]
+[ext_resource type="Texture2D" uid="uid://tb7eulf8c4sj" path="res://sprites/screwit-up-title-screen-animation_2.png" id="4_7b55j"]
+[ext_resource type="Texture2D" uid="uid://cgqxr0cvqeixq" path="res://sprites/exit-button-pixilart-32x.png" id="4_hstxw"]
+[ext_resource type="Script" uid="uid://uxp1dijdu3mn" path="res://scripts/texture_whimsy.gd" id="4_sway"]
+[ext_resource type="Texture2D" uid="uid://d0tfjnmqdxflp" path="res://sprites/screwit-up-title-screen-animation_3.png" id="5_5pajh"]
+[ext_resource type="Texture2D" uid="uid://ut86b6e16p0b" path="res://sprites/start_button_cropped.png" id="5_start"]
+[ext_resource type="Texture2D" uid="uid://cs2r7odg413l8" path="res://sprites/screwit-up-title-screen-animation_4.png" id="6_j7ex8"]
+[ext_resource type="Texture2D" uid="uid://v82mjpn227rj" path="res://sprites/start_button_focus.png" id="6_start_focus"]
+[ext_resource type="Texture2D" uid="uid://vlc0h4mhuflk" path="res://sprites/screwit-up-title-screen-animation_5.png" id="7_a8gd2"]
+[ext_resource type="Texture2D" uid="uid://clketjhryu41n" path="res://sprites/quit_button_cropped.png" id="7_quit"]
+[ext_resource type="Texture2D" uid="uid://cc34g4piwovgy" path="res://sprites/screwit-up-title-screen-animation_6.png" id="8_hstxw"]
+[ext_resource type="Texture2D" uid="uid://c5l8doy2cjau0" path="res://sprites/quit_button_focus.png" id="8_quit_focus"]
+[ext_resource type="Texture2D" uid="uid://cc6wx3vj1giy3" path="res://sprites/screwit-up-title-screen-animation_7.png" id="9_8egab"]
+[ext_resource type="Texture2D" uid="uid://7v0sk7qjlvkx" path="res://sprites/screwit-up-title-screen-animation_8.png" id="10_gw5y6"]
+[ext_resource type="AudioStream" uid="uid://cp58lqeeado7k" path="res://audio/click_button_sound.mp3" id="19_hstxw"]
 
-[node name="MainMenu" type="Control"]
+[sub_resource type="SpriteFrames" id="SpriteFrames_0cwvh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_1ajci")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_7b55j")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_5pajh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_j7ex8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_a8gd2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_hstxw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_8egab")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_gw5y6")
+}],
+"loop": 1,
+"name": &"title_anim",
+"speed": 5.0
+}]
+
+[node name="MainMenu" type="Control" unique_id=1831473447]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,7 +61,35 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
 
-[node name="TitleBackground" type="TextureRect" parent="."]
+[node name="Titlecard" type="AnimatedSprite2D" parent="." unique_id=784439980]
+position = Vector2(929, 140.00003)
+scale = Vector2(0.7497441, 0.64344263)
+sprite_frames = SubResource("SpriteFrames_0cwvh")
+animation = &"title_anim"
+autoplay = "title_anim"
+script = ExtResource("4_sway")
+sway_speed = 0.35
+
+[node name="CreditsOverlay" type="Control" parent="." unique_id=1499437124]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Sprite2D" type="Sprite2D" parent="CreditsOverlay" unique_id=742457873]
+position = Vector2(943.99994, 481)
+scale = Vector2(7.1600027, 5.2)
+texture = ExtResource("3_a8gd2")
+
+[node name="CloseButton" type="Button" parent="CreditsOverlay" unique_id=1354811844]
+layout_mode = 0
+offset_left = 700.0
+offset_top = 559.0
+offset_right = 1220.0
+offset_bottom = 1079.0
+scale = Vector2(0.25, 0.25)
+icon = ExtResource("4_hstxw")
+
+[node name="TitleBackground" type="TextureRect" parent="." unique_id=630227361]
 z_index = -10
 layout_mode = 1
 anchors_preset = 15
@@ -29,58 +100,58 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("2_bg")
 expand_mode = 1
-stretch_mode = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="MenuContent" type="Control" parent="." unique_id=200979284]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="CreditsButton" type="Button" parent="MenuContent" unique_id=303013937]
+layout_mode = 0
+offset_left = 1256.0001
+offset_top = 343.00003
+offset_right = 1648.0001
+offset_bottom = 759.0
+scale = Vector2(0.25496224, 0.26607463)
+icon = ExtResource("2_5pajh")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuContent" unique_id=1033581217]
 layout_mode = 1
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -420.0
-offset_top = 70.0
-offset_right = 420.0
-offset_bottom = 680.0
+offset_left = 505.0
+offset_top = 328.0
+offset_right = 1345.0
+offset_bottom = 938.0
 grow_horizontal = 2
 theme_override_constants/separation = 24
-alignment = 0
 
-[node name="TitleImage" type="TextureRect" parent="VBoxContainer"]
-custom_minimum_size = Vector2(650, 180)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-texture = ExtResource("3_title")
-expand_mode = 1
-stretch_mode = 5
-script = ExtResource("4_sway")
-sway_degrees = 3.5
-sway_speed = 0.45
-
-[node name="PlayButton" type="TextureButton" parent="VBoxContainer"]
+[node name="PlayButton" type="TextureButton" parent="MenuContent/VBoxContainer" unique_id=1915173432]
 z_index = 20
 custom_minimum_size = Vector2(300, 95)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
-focus_mode = 2
-mouse_filter = 0
-ignore_texture_size = true
-stretch_mode = 5
 texture_normal = ExtResource("5_start")
 texture_pressed = ExtResource("6_start_focus")
 texture_hover = ExtResource("6_start_focus")
 texture_focused = ExtResource("6_start_focus")
+ignore_texture_size = true
+stretch_mode = 5
 
-[node name="QuitButton" type="TextureButton" parent="VBoxContainer"]
+[node name="QuitButton" type="TextureButton" parent="MenuContent/VBoxContainer" unique_id=506691884]
 z_index = 20
 custom_minimum_size = Vector2(260, 95)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
-focus_mode = 2
-mouse_filter = 0
-ignore_texture_size = true
-stretch_mode = 5
 texture_normal = ExtResource("7_quit")
 texture_pressed = ExtResource("8_quit_focus")
 texture_hover = ExtResource("8_quit_focus")
 texture_focused = ExtResource("8_quit_focus")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=388581713]
+stream = ExtResource("19_hstxw")

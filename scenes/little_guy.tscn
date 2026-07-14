@@ -6,12 +6,14 @@
 [ext_resource type="AudioStream" uid="uid://c887vdtlrb3jf" path="res://audio/rare_guy_pop.mp3" id="4_oghk0"]
 
 [node name="LittleGuy" type="Node2D" unique_id=338728597 node_paths=PackedStringArray("little_guy_pop", "rare_guy_pop")]
+z_index = 100
 scale = Vector2(3, 3)
 script = ExtResource("1_ppv50")
 little_guy_pop = NodePath("Audio/LittleGuyPop")
 rare_guy_pop = NodePath("Audio/RareGuyPop")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=136963205]
+z_index = 100
 scale = Vector2(0.025, 0.025)
 texture = ExtResource("1_qctxp")
 

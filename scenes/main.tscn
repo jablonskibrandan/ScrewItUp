@@ -6,10 +6,22 @@
 [ext_resource type="Script" uid="uid://dpe8fjjdne8hc" path="res://scripts/camera.gd" id="2_tefeu"]
 [ext_resource type="PackedScene" uid="uid://byt8bu3al3ssh" path="res://scenes/little_guy.tscn" id="3_tbgi4"]
 [ext_resource type="Script" uid="uid://d1nfhkv0jhjpi" path="res://scripts/UI.gd" id="4_tbgi4"]
+[ext_resource type="Texture2D" uid="uid://yf1j2dq0d7ed" path="res://sprites/main_scene_background/expanded-border-pixilart.png" id="5_0ld40"]
+[ext_resource type="Texture2D" uid="uid://b7icfy2i4gb5i" path="res://sprites/main_scene_background/background-pixilart_2.png" id="6_gqmmt"]
 [ext_resource type="AudioStream" uid="uid://cp58lqeeado7k" path="res://audio/click_button_sound.mp3" id="7_o6xl0"]
-[ext_resource type="Texture2D" path="res://sprites/progress_bar.png" id="8_progressbar"]
-[ext_resource type="Texture2D" path="res://sprites/progress_little_guy_marker.png" id="9_progressguy"]
-[ext_resource type="Script" path="res://scripts/stack_progress_bar.gd" id="10_progressscript"]
+[ext_resource type="Texture2D" uid="uid://df82kuvsdtafa" path="res://sprites/main_scene_background/background-pixilart_1.png" id="7_yc10j"]
+[ext_resource type="Texture2D" uid="uid://c50foa40t426p" path="res://sprites/main_scene_background/expanded-background-pixilart_1.png" id="8_jscy8"]
+[ext_resource type="Texture2D" uid="uid://ctahptrhrvaid" path="res://sprites/end_cutscene/lightbulb-base-pixilart-6x.png" id="8_pm3ni"]
+[ext_resource type="Texture2D" uid="uid://dtjyd7xpgq33t" path="res://sprites/progress_bar.png" id="8_progressbar"]
+[ext_resource type="Texture2D" uid="uid://cc370k4im3tig" path="res://sprites/upgrade_buttons/little-guy-button-pixilart_2-8x.png" id="9_jbj1t"]
+[ext_resource type="Texture2D" uid="uid://b601uovj0s43w" path="res://sprites/progress_little_guy_marker.png" id="9_progressguy"]
+[ext_resource type="Texture2D" uid="uid://bk8arvw1g8l6e" path="res://sprites/upgrade_buttons/idea-rate-button-pixilart_2-8x.png" id="10_muem4"]
+[ext_resource type="Script" uid="uid://b345a0lkw5hw1" path="res://scripts/stack_progress_bar.gd" id="10_progressscript"]
+[ext_resource type="Texture2D" uid="uid://cjwotn2fsyxft" path="res://sprites/upgrade_buttons/little-guy-button-pixilart_1-8x.png" id="11_dp3eg"]
+[ext_resource type="Texture2D" uid="uid://bj0qp2mgy50dn" path="res://sprites/upgrade_buttons/bright-idea-chance-button-pixilart-12x.png" id="12_bright"]
+[ext_resource type="Texture2D" uid="uid://cnnstugyqgg0j" path="res://sprites/upgrade_buttons/little-guy-button-pixilart_3-8x.png" id="13_gqmmt"]
+[ext_resource type="FontFile" uid="uid://cdkyujordns60" path="res://fonts/atari full.ttf" id="14_jscy8"]
+[ext_resource type="Texture2D" uid="uid://bb2oqqf84ycps" path="res://sprites/upgrade_buttons/auto-buy-button-pixilart-8x.png" id="14_yc10j"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_left"]
 region = Rect2(0, 0, 160, 1000)
@@ -111,23 +123,26 @@ loop = true
 [node name="World" type="Node2D" parent="." unique_id=1707558531]
 
 [node name="CenterSkyFill" type="Polygon2D" parent="World" unique_id=1462337340]
+visible = false
 color = Color(0.0352941, 0.101961, 0.145098, 1)
 polygon = PackedVector2Array(323, -4000, 637, -4000, 637, 700, 323, 700)
 
 [node name="CenterBackground" type="Sprite2D" parent="World" unique_id=159344720]
+visible = false
 texture_filter = 1
-position = Vector2(480, -310)
-scale = Vector2(2, 2)
+position = Vector2(480, -487.5)
+scale = Vector2(2, 2.355)
 texture = ExtResource("1_o5qli")
 
 [node name="StackRoot" type="Node2D" parent="World" unique_id=1356934903]
+z_index = 50
 position = Vector2(475, 653)
 
 [node name="SpawnPoint" type="Marker2D" parent="World" unique_id=406115017]
 position = Vector2(476, 609)
 
-[node name="ProgressTopPoint" type="Marker2D" parent="World"]
-position = Vector2(475, -1300)
+[node name="ProgressTopPoint" type="Marker2D" parent="World" unique_id=1787164101]
+position = Vector2(487, -2169)
 
 [node name="Camera2D" type="Camera2D" parent="World" unique_id=877441994 node_paths=PackedStringArray("camera")]
 position = Vector2(480, 420)
@@ -152,9 +167,73 @@ game_manager = NodePath("../../GameManager")
 camera_controller = NodePath("../Camera2D")
 
 [node name="LittleGuy" parent="World" unique_id=338728597 instance=ExtResource("3_tbgi4")]
-position = Vector2(475, 638)
+position = Vector2(461.00003, 634)
 
-[node name="ScreenUI" type="CanvasLayer" parent="." unique_id=1507895780 node_paths=PackedStringArray("spawner", "game_manager", "buy_guy_button", "idea_time_reduce_button", "rare_chance_button", "bright_chance_button", "auto_buy_button", "auto_buy_speed_button", "ideas_label", "bright_ideas_label", "little_guys_label", "idea_time_label", "button_click_sfx")]
+[node name="MainWorld" type="Node2D" parent="World" unique_id=404955480]
+
+[node name="SkyBackground" type="Sprite2D" parent="World/MainWorld" unique_id=643423696]
+z_index = -30
+position = Vector2(475, -803)
+scale = Vector2(6.182652, 2.9478114)
+texture = ExtResource("6_gqmmt")
+
+[node name="GroundArea" type="Sprite2D" parent="World/MainWorld" unique_id=459946840]
+z_index = -20
+position = Vector2(480, -567)
+scale = Vector2(6.04, 2.521286)
+texture = ExtResource("7_yc10j")
+
+[node name="EndArea" type="Sprite2D" parent="World/MainWorld" unique_id=727642458]
+position = Vector2(467.99997, -125)
+rotation = -3.1415927
+scale = Vector2(2.1211927, 3.9855673)
+texture = ExtResource("8_jscy8")
+
+[node name="LightbulbBasePixilart6x" type="Sprite2D" parent="World/MainWorld" unique_id=231722229]
+position = Vector2(452.00003, -1927.0001)
+scale = Vector2(0.40000486, 0.5527441)
+texture = ExtResource("8_pm3ni")
+
+[node name="LatticeAreas" type="Node2D" parent="World" unique_id=1460534696]
+z_index = 5
+
+[node name="Lattice2" type="Sprite2D" parent="World/LatticeAreas" unique_id=180006822]
+visible = false
+position = Vector2(801, -2110)
+scale = Vector2(2.0125787, 5.6)
+texture = ExtResource("5_0ld40")
+
+[node name="Lattice1" type="Sprite2D" parent="World/LatticeAreas" unique_id=1113442374]
+visible = false
+position = Vector2(159, -2110)
+scale = Vector2(2.0125787, 5.6)
+texture = ExtResource("5_0ld40")
+
+[node name="TextureRect" type="TextureRect" parent="World/LatticeAreas" unique_id=1351673638]
+texture_filter = 1
+texture_repeat = 2
+offset_left = 638.0
+offset_top = -2310.0
+offset_right = 958.0
+offset_bottom = 690.0
+mouse_filter = 2
+texture = ExtResource("5_0ld40")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="World/LatticeAreas" unique_id=814014878]
+texture_filter = 1
+texture_repeat = 2
+offset_left = -6.0
+offset_top = -2306.0
+offset_right = 314.0
+offset_bottom = 694.0
+mouse_filter = 2
+texture = ExtResource("5_0ld40")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="ScreenUI" type="CanvasLayer" parent="." unique_id=1507895780 node_paths=PackedStringArray("spawner", "game_manager", "buy_guy_button", "idea_time_reduce_button", "rare_chance_button", "bright_chance_button", "auto_buy_button", "auto_buy_speed_button", "ideas_label", "bright_ideas_label", "little_guys_label", "idea_time_label", "rare_chance_label", "bright_idea_chance_label", "button_click_sfx")]
 layer = 10
 script = ExtResource("4_tbgi4")
 spawner = NodePath("../World/Spawner")
@@ -169,6 +248,8 @@ ideas_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/IdeasLabel")
 bright_ideas_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/BrightIdeasLabel")
 little_guys_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/StackLabel")
 idea_time_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/IdeaSpeedLabel")
+rare_chance_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/RareGuyChanceLabel")
+bright_idea_chance_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/BrightIdeaChanceLabel")
 button_click_sfx = NodePath("../UIAudio/ClickAudio")
 
 [node name="UIRoot" type="Control" parent="ScreenUI" unique_id=2017129080]
@@ -181,6 +262,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="LeftLattice" type="TextureRect" parent="ScreenUI/UIRoot" unique_id=885688112]
+visible = false
 layout_mode = 0
 offset_top = -4000.0
 offset_right = 320.0
@@ -189,6 +271,7 @@ mouse_filter = 2
 texture = SubResource("AtlasTexture_left")
 
 [node name="RightLattice" type="TextureRect" parent="ScreenUI/UIRoot" unique_id=1987723401]
+visible = false
 layout_mode = 0
 offset_left = 1600.0
 offset_top = -4000.0
@@ -236,30 +319,39 @@ layout_mode = 2
 text = "Idea Time: 5.00s"
 label_settings = SubResource("LabelSettings_big")
 
-[node name="ProgressBarPanel" type="Control" parent="ScreenUI/UIRoot" node_paths=PackedStringArray("spawner")]
-layout_mode = 0
-offset_left = 1350.0
-offset_top = 245.0
-offset_right = 1448.0
-offset_bottom = 715.0
+[node name="RareGuyChanceLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=1167656782]
+layout_mode = 2
+text = "Rare Guy Chance: 1%"
+label_settings = SubResource("LabelSettings_big")
+
+[node name="BrightIdeaChanceLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=1785499476]
+layout_mode = 2
+text = "Rare Guy Chance: 1%"
+label_settings = SubResource("LabelSettings_big")
+
+[node name="ProgressBarPanel" type="Control" parent="ScreenUI/UIRoot" unique_id=706491609 node_paths=PackedStringArray("spawner")]
+anchors_preset = 0
+offset_left = 2.0
+offset_top = 384.0
+offset_right = 100.0
+offset_bottom = 854.0
 mouse_filter = 2
 script = ExtResource("10_progressscript")
 spawner = NodePath("../../../World/Spawner")
 top_padding = 14.0
 bottom_padding = 18.0
 
-[node name="ProgressBarImage" type="TextureRect" parent="ScreenUI/UIRoot/ProgressBarPanel"]
+[node name="ProgressBarImage" type="TextureRect" parent="ScreenUI/UIRoot/ProgressBarPanel" unique_id=1630643701]
 layout_mode = 0
-offset_left = 24.0
-offset_top = 10.0
-offset_right = 96.0
-offset_bottom = 450.0
+offset_left = 22.0
+offset_top = 48.0
+offset_right = 94.0
+offset_bottom = 488.0
 mouse_filter = 2
 texture = ExtResource("8_progressbar")
 expand_mode = 1
-stretch_mode = 0
 
-[node name="ProgressGuyMarker" type="TextureRect" parent="ScreenUI/UIRoot/ProgressBarPanel"]
+[node name="ProgressGuyMarker" type="TextureRect" parent="ScreenUI/UIRoot/ProgressBarPanel" unique_id=1710062749]
 layout_mode = 0
 offset_left = 28.0
 offset_top = 400.0
@@ -276,6 +368,7 @@ offset_left = 1456.0
 offset_top = 28.0
 offset_right = 1892.0
 offset_bottom = 856.0
+scale = Vector2(1.12, 1.0799994)
 theme_override_styles/panel = SubResource("StyleBoxFlat_ui_panel")
 
 [node name="MarginContainer" type="MarginContainer" parent="ScreenUI/UIRoot/UpgradePanel" unique_id=1895566090]
@@ -287,16 +380,17 @@ theme_override_constants/margin_bottom = 18
 
 [node name="UpgradeVBox" type="VBoxContainer" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer" unique_id=505197149]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 8
 
 [node name="UpgradeTitle" type="Label" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox" unique_id=1489120150]
+visible = false
 layout_mode = 2
 text = "UPGRADES"
 label_settings = SubResource("LabelSettings_big")
 horizontal_alignment = 1
 
 [node name="BuyGuyButton" type="Button" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox" unique_id=1858257566]
-custom_minimum_size = Vector2(0, 92)
+custom_minimum_size = Vector2(0, 142)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 23
@@ -305,11 +399,33 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
-text = "Buy Little Guy
-Cost: 1"
+icon = ExtResource("9_jbj1t")
+clip_text = true
+expand_icon = true
+
+[node name="CostLabel" type="Label" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox/BuyGuyButton" unique_id=517608573]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 90.0
+offset_top = 66.0
+offset_right = -93.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.75, 0.75)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("14_jscy8")
+theme_override_font_sizes/font_size = 22
+text = "COST: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="IdeaSpeedButton" type="Button" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox" unique_id=1763331947]
-custom_minimum_size = Vector2(0, 92)
+custom_minimum_size = Vector2(0, 142)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
@@ -318,11 +434,33 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
-text = "Idea Speed
-Cost: 5"
+icon = ExtResource("10_muem4")
+clip_text = true
+expand_icon = true
+
+[node name="CostLabel" type="Label" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox/IdeaSpeedButton" unique_id=616178901]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 90.0
+offset_top = 66.0
+offset_right = -93.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.75, 0.75)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("14_jscy8")
+theme_override_font_sizes/font_size = 22
+text = "COST: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="RareChanceButton" type="Button" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox" unique_id=1114152434]
-custom_minimum_size = Vector2(0, 92)
+custom_minimum_size = Vector2(0, 142)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
@@ -331,11 +469,33 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
-text = "Rare Guy Chance
-Cost: 50"
+icon = ExtResource("11_dp3eg")
+clip_text = true
+expand_icon = true
+
+[node name="CostLabel" type="Label" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox/RareChanceButton" unique_id=1102064577]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 90.0
+offset_top = 66.0
+offset_right = -93.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.75, 0.75)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("14_jscy8")
+theme_override_font_sizes/font_size = 22
+text = "COST: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="BrightChanceButton" type="Button" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox" unique_id=1136610087]
-custom_minimum_size = Vector2(0, 92)
+custom_minimum_size = Vector2(0, 142)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
@@ -344,11 +504,33 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
-text = "Bright Idea Chance
-Cost: 50"
+icon = ExtResource("12_bright")
+clip_text = true
+expand_icon = true
+
+[node name="CostLabel" type="Label" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox/BrightChanceButton" unique_id=847065499]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 90.0
+offset_top = 66.0
+offset_right = -93.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.75, 0.75)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("14_jscy8")
+theme_override_font_sizes/font_size = 22
+text = "COST: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="AutoBuyButton" type="Button" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox" unique_id=1325239892]
-custom_minimum_size = Vector2(0, 92)
+custom_minimum_size = Vector2(0, 142)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
@@ -357,11 +539,33 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
 theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
-text = "Unlock Auto Buyer
-Cost: 500"
+icon = ExtResource("13_gqmmt")
+clip_text = true
+expand_icon = true
+
+[node name="CostLabel" type="Label" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox/AutoBuyButton" unique_id=373797608]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 90.0
+offset_top = 66.0
+offset_right = -93.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.75, 0.75)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("14_jscy8")
+theme_override_font_sizes/font_size = 22
+text = "COST: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="AutoBuySpeedButton" type="Button" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox" unique_id=1410496706]
-custom_minimum_size = Vector2(0, 92)
+custom_minimum_size = Vector2(0, 142)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
@@ -371,11 +575,35 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
 theme_override_styles/disabled = SubResource("StyleBoxFlat_button_disabled")
 theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
 disabled = true
-text = "Auto Buyer Speed
-10.0s"
+icon = ExtResource("14_yc10j")
+clip_text = true
+expand_icon = true
+
+[node name="CostLabel" type="Label" parent="ScreenUI/UIRoot/UpgradePanel/MarginContainer/UpgradeVBox/AutoBuySpeedButton" unique_id=864252140]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 90.0
+offset_top = 66.0
+offset_right = -93.0
+offset_bottom = -36.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.75, 0.75)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("14_jscy8")
+theme_override_font_sizes/font_size = 22
+text = "COST: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="GameManager" type="Node" parent="." unique_id=335116798]
 script = ExtResource("2_0wfyh")
+little_guy_linear_growth = 2.0
+little_guy_quadratic_growth = 2.5545999999999998
 
 [node name="UIAudio" type="Node2D" parent="." unique_id=869765653]
 

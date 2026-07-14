@@ -21,7 +21,7 @@ signal rare_guy_unlocked
 signal bright_idea_unlocked
 
 
-var ideas: int = 500
+var ideas: int = 1000000
 var bright_ideas: int = 0
 
 # Game starts with 1 little guy already existing in the scene.
@@ -42,7 +42,22 @@ var rare_guy_chance_increase: float = 0.0025
 var has_found_rare_guy: bool = false
 var has_found_bright_idea: bool = false
 
-var little_guy_raw_cost: float = 1.0
+
+# Cost = base + (linear * purchases) + (quadratic * purchases^2)
+#
+# The absolute price increase gradually becomes larger, but the percentage
+# increase between purchases becomes smaller over time. This avoids the
+# runaway exponential growth caused by repeatedly multiplying by 1.25.
+@export_category("Little Guy Polynomial Cost")
+@export var little_guy_base_cost: float = 1.0
+@export_range(0.0, 1000.0, 0.01) var little_guy_linear_growth: float = 0.25
+@export_range(0.0, 100.0, 0.0001) var little_guy_quadratic_growth: float = 0.01
+
+# This only counts purchased Little Guys.
+# The free starting Little Guy is not included.
+var little_guys_purchased: int = 0
+
+# Other upgrade costs still use the normal 25% multiplier.
 var idea_time_reduce_raw_cost: float = 5.0
 var rare_chance_raw_cost: float = 50.0
 var bright_chance_raw_cost: float = 50.0
@@ -56,6 +71,12 @@ var auto_buy_timer: float = 0.0
 var auto_buy_interval: float = 10.0
 var auto_buy_interval_reduce_amount: float = 1.0
 var min_auto_buy_interval: float = 3.0
+
+# Once a Little Guy costs more than this, auto-buy only pays a percentage
+# of the amount above the soft cap.
+@export_category("Auto-Buy Little Guy Discount")
+@export var auto_buy_little_guy_soft_cap: int = 100_000
+@export_range(0.0, 1.0, 0.01) var auto_buy_excess_cost_percent: float = 0.10
 
 var production_timer: float = 0.0
 
@@ -97,9 +118,9 @@ func _process_auto_buyer(delta: float) -> void:
 	if auto_buy_timer >= auto_buy_interval:
 		auto_buy_timer -= auto_buy_interval
 
-		# Auto-buyer tries to buy one little guy.
-		# If you cannot afford it, nothing happens.
-		try_buy_little_guy()
+		# Auto-buy uses the discounted late-game Little Guy cost.
+		# If you still cannot afford it, nothing happens.
+		try_buy_little_guy(true)
 
 
 func produce_from_little_guys() -> void:
@@ -112,13 +133,53 @@ func produce_from_little_guys() -> void:
 	# Rare guys always produce bright ideas.
 	var total_bright_ideas: int = rare_little_guys + random_bright_ideas
 
-	# Normal guys still produce regular ideas.
-	# If a bright idea happened this cycle, do not also show the normal idea lamp.
+	# Keep the existing economy behavior. Lamp visuals are emitted separately
+	# so they can be sent to the exact little guy that produced them.
 	if normal_little_guys > 0:
-		add_ideas(normal_little_guys, total_bright_ideas == 0)
+		add_ideas(normal_little_guys, false)
 
 	if total_bright_ideas > 0:
 		add_bright_ideas(total_bright_ideas)
+
+	_show_production_lamps(random_bright_ideas, total_bright_ideas)
+
+
+func _show_production_lamps(
+	random_bright_ideas: int,
+	total_bright_ideas: int
+) -> void:
+	var all_guys: Array[Node] = get_tree().get_nodes_in_group("little_guys")
+
+	if all_guys.is_empty():
+		return
+
+	var normal_guys: Array[Node] = []
+	var rare_guys: Array[Node] = []
+
+	for guy: Node in all_guys:
+		if not is_instance_valid(guy):
+			continue
+
+		if bool(guy.get("is_rare")):
+			rare_guys.append(guy)
+		else:
+			normal_guys.append(guy)
+
+	# Preserve the previous visual rule: when no bright idea happens,
+	# every normal guy displays a regular idea lamp.
+	if total_bright_ideas == 0:
+		for guy: Node in normal_guys:
+			ManagerCommunication.show_idea_lamp(guy)
+		return
+
+	# Rare guys always produce bright ideas, so each rare guy gets its own lamp.
+	for guy: Node in rare_guys:
+		ManagerCommunication.show_bright_idea_lamp(guy)
+
+	# A random bright idea belongs to exactly one normal little guy.
+	if random_bright_ideas > 0 and not normal_guys.is_empty():
+		var bright_producer: Node = normal_guys.pick_random() as Node
+		ManagerCommunication.show_bright_idea_lamp(bright_producer)
 
 
 func get_ideas() -> int:
@@ -136,6 +197,10 @@ func get_amt_little_guys() -> int:
 func set_amt_little_guys(amt: int) -> void:
 	amt_little_guys = max(0, amt)
 
+	# Keep the cost curve synchronized when loading a saved amount.
+	little_guys_purchased = max(0, amt_little_guys - 1)
+	costs_changed.emit()
+
 
 func add_little_guy_count(is_rare: bool = false) -> void:
 	amt_little_guys += 1
@@ -146,7 +211,34 @@ func add_little_guy_count(is_rare: bool = false) -> void:
 
 
 func get_little_guy_cost() -> int:
-	return max(1, int(floor(little_guy_raw_cost)))
+	# Quadratic polynomial curve:
+	# base + (linear * purchases) + (quadratic * purchases^2)
+	#
+	# Unlike multiplying the previous cost by 1.25, this calculates every
+	# price directly from the purchase count. The effective percentage jump
+	# therefore becomes smaller as the player buys more Little Guys.
+	var purchases: float = float(little_guys_purchased)
+	var calculated_cost: float = (
+		little_guy_base_cost
+		+ little_guy_linear_growth * purchases
+		+ little_guy_quadratic_growth * purchases * purchases
+	)
+
+	return maxi(1, int(round(calculated_cost)))
+
+
+func get_auto_buy_little_guy_cost() -> int:
+	var normal_cost: int = get_little_guy_cost()
+
+	if normal_cost <= auto_buy_little_guy_soft_cap:
+		return normal_cost
+
+	var amount_above_cap: int = normal_cost - auto_buy_little_guy_soft_cap
+	var discounted_excess: int = int(ceil(
+		float(amount_above_cap) * auto_buy_excess_cost_percent
+	))
+
+	return auto_buy_little_guy_soft_cap + discounted_excess
 
 
 func get_idea_time_reduce_cost() -> int:
@@ -239,13 +331,19 @@ func add_bright_ideas(amount: int) -> void:
 		bright_idea_unlocked.emit()
 
 
-func try_buy_little_guy() -> bool:
-	var cost := get_little_guy_cost()
+func try_buy_little_guy(is_auto_buy: bool = false) -> bool:
+	var cost: int
+
+	if is_auto_buy:
+		cost = get_auto_buy_little_guy_cost()
+	else:
+		cost = get_little_guy_cost()
 
 	if not spend_ideas(cost):
 		return false
 
-	little_guy_raw_cost *= COST_MULTIPLIER
+	# Advance the curve immediately after a successful purchase.
+	little_guys_purchased += 1
 
 	# Do NOT increase amt_little_guys here.
 	# The Spawner does that after it knows whether the new guy is rare.
@@ -256,7 +354,7 @@ func try_buy_little_guy() -> bool:
 
 
 func try_pay_for_little_guy() -> bool:
-	return try_buy_little_guy()
+	return try_buy_little_guy(false)
 
 
 func try_buy_idea_time_reduce() -> bool:

@@ -14,6 +14,8 @@ extends CanvasLayer
 @export var bright_ideas_label: Label
 @export var little_guys_label: Label
 @export var idea_time_label: Label
+@export var rare_chance_label: Label
+@export var bright_idea_chance_label: Label
 
 @export var button_click_sfx: AudioStreamPlayer
 
@@ -36,7 +38,7 @@ func _ready() -> void:
 	if bright_chance_button != null:
 		bright_chance_button.visible = game_manager.has_found_bright_idea
 
-	# Only use this if you ever change the game to start with zero guys.
+	# Only use this if the game is changed to start with zero guys.
 	if game_manager.get_amt_little_guys() <= 0:
 		spawner.add_starting_guy()
 
@@ -70,7 +72,7 @@ func _connect_game_manager_signals() -> void:
 	game_manager.rare_guy_unlocked.connect(on_rare_guy_unlocked)
 	game_manager.bright_idea_unlocked.connect(on_bright_idea_unlocked)
 
-	# This makes manual buying and auto-buying use the exact same spawn path.
+	# Manual buying and auto-buying use the same spawn path.
 	var purchase_callable := Callable(self, "on_little_guy_purchased")
 	if not game_manager.little_guy_purchased.is_connected(purchase_callable):
 		game_manager.little_guy_purchased.connect(purchase_callable)
@@ -172,11 +174,17 @@ func _update_labels() -> void:
 	if idea_time_label != null:
 		idea_time_label.text = "Idea Time: %.2fs" % game_manager.idea_production_time
 
+	if rare_chance_label != null:
+		rare_chance_label.text = "Rare Chance Rate: %d %%" % game_manager.get_rare_guy_chance_percent()
+	
+	if bright_idea_chance_label != null:
+		bright_idea_chance_label.text = "Bright Idea Chance: %d %%" % game_manager.get_bright_idea_chance_percent()
 
 func _update_upgrade_buttons() -> void:
 	if buy_guy_button != null:
 		var guy_cost := game_manager.get_little_guy_cost()
-		buy_guy_button.text = "Buy Little Guy\nOwned: %d  Cost: %d" % [
+		_set_cost_text(buy_guy_button, guy_cost)
+		buy_guy_button.tooltip_text = "Buy a Little Guy\nOwned: %d\nCost: %d ideas" % [
 			game_manager.get_amt_little_guys(),
 			guy_cost
 		]
@@ -185,19 +193,25 @@ func _update_upgrade_buttons() -> void:
 	if idea_time_reduce_button != null:
 		var speed_cost := game_manager.get_idea_time_reduce_cost()
 		if speed_cost == 0:
-			idea_time_reduce_button.text = "Idea Speed\nMAX %.2fs" % game_manager.idea_production_time
+			_set_status_text(idea_time_reduce_button, "MAX")
+			idea_time_reduce_button.tooltip_text = "Idea Rate is already at its maximum speed."
 			idea_time_reduce_button.disabled = true
 		else:
-			idea_time_reduce_button.text = "Idea Speed\n%.2fs → %.2fs  Cost: %d" % [
+			_set_cost_text(idea_time_reduce_button, speed_cost)
+			idea_time_reduce_button.tooltip_text = "Reduce idea time from %.2fs to %.2fs\nCost: %d ideas" % [
 				game_manager.idea_production_time,
-				max(game_manager.min_idea_production_time, game_manager.idea_production_time - game_manager.idea_time_reduce_amount),
+				max(
+					game_manager.min_idea_production_time,
+					game_manager.idea_production_time - game_manager.idea_time_reduce_amount
+				),
 				speed_cost
 			]
 			idea_time_reduce_button.disabled = not game_manager.can_afford_ideas(speed_cost)
 
 	if rare_chance_button != null:
 		var rare_cost := game_manager.get_rare_chance_cost()
-		rare_chance_button.text = "Rare Guy Chance\n%.2f%%  Cost: %d" % [
+		_set_cost_text(rare_chance_button, rare_cost)
+		rare_chance_button.tooltip_text = "Rare Guy chance: %.2f%%\nCost: %d ideas" % [
 			game_manager.get_rare_guy_chance_percent(),
 			rare_cost
 		]
@@ -205,7 +219,8 @@ func _update_upgrade_buttons() -> void:
 
 	if bright_chance_button != null:
 		var bright_cost := game_manager.get_bright_chance_cost()
-		bright_chance_button.text = "Bright Idea Chance\n%.2f%%  Cost: %d" % [
+		_set_cost_text(bright_chance_button, bright_cost)
+		bright_chance_button.tooltip_text = "Bright Idea chance: %.2f%%\nCost: %d ideas" % [
 			game_manager.get_bright_idea_chance_percent(),
 			bright_cost
 		]
@@ -222,12 +237,17 @@ func _update_auto_buy_ui() -> void:
 
 		var speed_cost := game_manager.get_auto_buy_speed_cost()
 		if speed_cost == 0:
-			auto_buy_speed_button.text = "Auto Buyer Speed\nMAX %.1fs" % game_manager.get_auto_buy_interval()
+			_set_status_text(auto_buy_speed_button, "MAX")
+			auto_buy_speed_button.tooltip_text = "Auto Buyer is already at maximum speed."
 			auto_buy_speed_button.disabled = true
 		else:
-			auto_buy_speed_button.text = "Auto Buyer Speed\n%.1fs → %.1fs  Cost: %d" % [
+			_set_cost_text(auto_buy_speed_button, speed_cost)
+			auto_buy_speed_button.tooltip_text = "Auto Buyer: %.1fs to %.1fs\nCost: %d ideas" % [
 				game_manager.get_auto_buy_interval(),
-				max(game_manager.min_auto_buy_interval, game_manager.get_auto_buy_interval() - game_manager.auto_buy_interval_reduce_amount),
+				max(
+					game_manager.min_auto_buy_interval,
+					game_manager.get_auto_buy_interval() - game_manager.auto_buy_interval_reduce_amount
+				),
 				speed_cost
 			]
 			auto_buy_speed_button.disabled = not game_manager.can_afford_ideas(speed_cost)
@@ -236,5 +256,20 @@ func _update_auto_buy_ui() -> void:
 		auto_buy_speed_button.visible = false
 
 		var unlock_cost := game_manager.get_auto_buyer_cost()
-		auto_buy_button.text = "Unlock Auto Buyer\nCost: %d" % unlock_cost
+		_set_cost_text(auto_buy_button, unlock_cost)
+		auto_buy_button.tooltip_text = "Unlock automatic Little Guy purchases.\nCost: %d ideas" % unlock_cost
 		auto_buy_button.disabled = not game_manager.can_afford_ideas(unlock_cost)
+
+
+func _set_cost_text(button: Button, cost: int) -> void:
+	_set_status_text(button, "%d" % cost)
+
+
+func _set_status_text(button: Button, value: String) -> void:
+	# The artwork remains the Button icon. This child Label overlays the cost
+	# without forcing the large source image outside the button bounds.
+	button.text = ""
+
+	var cost_label := button.get_node_or_null("CostLabel") as Label
+	if cost_label != null:
+		cost_label.text = value

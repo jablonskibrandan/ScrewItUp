@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ddlivfvh8jatk"
+path="res://.godot/imported/xtremefreddy-game-music-loop-1-143979 (1).mp3-8b186e75480d5dec1b14326760bd9486.mp3str"
+
+[deps]
+
+source_file="res://audio/xtremefreddy-game-music-loop-1-143979 (1).mp3"
+dest_files=["res://.godot/imported/xtremefreddy-game-music-loop-1-143979 (1).mp3-8b186e75480d5dec1b14326760bd9486.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
