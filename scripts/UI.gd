@@ -175,10 +175,10 @@ func _update_labels() -> void:
 		idea_time_label.text = "Idea Time: %.2fs" % game_manager.idea_production_time
 
 	if rare_chance_label != null:
-		rare_chance_label.text = "Rare Chance Rate: %d %%" % game_manager.get_rare_guy_chance_percent()
+		rare_chance_label.text = "Rare Chance Rate: %.2f %%" % game_manager.get_rare_guy_chance_percent()
 	
 	if bright_idea_chance_label != null:
-		bright_idea_chance_label.text = "Bright Idea Chance: %d %%" % game_manager.get_bright_idea_chance_percent()
+		bright_idea_chance_label.text = "Bright Idea Chance: %.2f %%" % game_manager.get_bright_idea_chance_percent()
 
 func _update_upgrade_buttons() -> void:
 	if buy_guy_button != null:

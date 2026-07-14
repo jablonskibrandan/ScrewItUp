@@ -18,7 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://c5l8doy2cjau0" path="res://sprites/quit_button_focus.png" id="8_quit_focus"]
 [ext_resource type="Texture2D" uid="uid://cc6wx3vj1giy3" path="res://sprites/screwit-up-title-screen-animation_7.png" id="9_8egab"]
 [ext_resource type="Texture2D" uid="uid://7v0sk7qjlvkx" path="res://sprites/screwit-up-title-screen-animation_8.png" id="10_gw5y6"]
-[ext_resource type="AudioStream" uid="uid://cp58lqeeado7k" path="res://audio/click_button_sound.mp3" id="19_hstxw"]
+[ext_resource type="AudioStream" uid="uid://bbh1gtramiha8" path="res://audio/xtremefreddy-game-music-loop-6-144641.mp3" id="19_hstxw"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_0cwvh"]
 animations = [{
@@ -155,3 +155,6 @@ stretch_mode = 5
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=388581713]
 stream = ExtResource("19_hstxw")
+volume_db = 24.0
+autoplay = true
+parameters/looping = true

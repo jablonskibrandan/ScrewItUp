@@ -21,7 +21,7 @@ signal rare_guy_unlocked
 signal bright_idea_unlocked
 
 
-var ideas: int = 1000000
+var ideas: int = 0
 var bright_ideas: int = 0
 
 # Game starts with 1 little guy already existing in the scene.
@@ -42,7 +42,9 @@ var rare_guy_chance_increase: float = 0.0025
 var has_found_rare_guy: bool = false
 var has_found_bright_idea: bool = false
 
-
+# Little Guy polynomial cost curve.
+# This replaces the permanent 25% compound multiplier.
+#
 # Cost = base + (linear * purchases) + (quadratic * purchases^2)
 #
 # The absolute price increase gradually becomes larger, but the percentage
@@ -111,6 +113,10 @@ func _process_idea_production(delta: float) -> void:
 
 func _process_auto_buyer(delta: float) -> void:
 	if not has_auto_buyer:
+		return
+
+	# Stop attempting purchases once the final stack position is reserved.
+	if not can_buy_more_little_guys():
 		return
 
 	auto_buy_timer += delta
@@ -331,7 +337,24 @@ func add_bright_ideas(amount: int) -> void:
 		bright_idea_unlocked.emit()
 
 
+func can_buy_more_little_guys() -> bool:
+	var spawner := get_tree().get_first_node_in_group("spawner")
+
+	if spawner == null:
+		return true
+
+	if spawner.has_method("can_add_more_guys"):
+		return bool(spawner.call("can_add_more_guys"))
+
+	return true
+
+
 func try_buy_little_guy(is_auto_buy: bool = false) -> bool:
+	# Check before charging the player. This covers both the manual button
+	# and the autobuyer.
+	if not can_buy_more_little_guys():
+		return false
+
 	var cost: int
 
 	if is_auto_buy:

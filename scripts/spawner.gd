@@ -22,6 +22,7 @@ signal stack_progress_changed(progress: float)
 
 @export var game_manager: GameManager
 @export var camera_controller: CameraController
+@export var ending_cutscene: EndingCutscene
 
 # Index 0 is the starting little guy.
 # First purchased little guy goes to index 1.
@@ -30,6 +31,10 @@ var next_stack_index: int = 1
 var stack_base_position: Vector2
 var spawn_position: Vector2
 var highest_stack_y: float = 0.0
+
+# Becomes true as soon as the final Little Guy is reserved.
+# This blocks clicks and autobuy while that final guy is still jumping.
+var ending_locked: bool = false
 
 
 func _enter_tree() -> void:
@@ -58,6 +63,14 @@ func _ready() -> void:
 		push_error("Spawner needs Camera Controller assigned.")
 		return
 
+	if progress_top_point == null:
+		push_error("Spawner needs Progress Top Point assigned.")
+		return
+
+	if ending_cutscene == null:
+		push_error("Spawner needs Ending Cutscene assigned.")
+		return
+
 	if starting_little_guy != null:
 		stack_base_position = starting_little_guy.global_position
 	elif stack_base_point != null:
@@ -75,12 +88,31 @@ func _ready() -> void:
 	print("Spawn position: ", spawn_position)
 
 
+# GameManager calls this before charging for either a manual or automatic guy.
+func can_add_more_guys() -> bool:
+	return not ending_locked
+
+
 func add_guy_to_stack() -> void:
+	if ending_locked:
+		return
+
 	if little_guy_scene == null:
 		push_error("Little Guy Scene is not assigned.")
 		return
 
 	var stack_index := next_stack_index
+	var target_position := get_stack_position(stack_index)
+	var reaches_ending := _position_reaches_ending(target_position)
+
+	# The normal spacing may put the final guy slightly above the marker.
+	# Clamp that final guy to the marker so the stack never passes it.
+	if reaches_ending:
+		target_position.y = progress_top_point.global_position.y
+
+		# Lock immediately, before the jump finishes. This prevents another
+		# click or autobuy tick from adding an extra guy during the animation.
+		ending_locked = true
 
 	var guy := little_guy_scene.instantiate() as Node2D
 	stack_root.add_child(guy)
@@ -93,22 +125,19 @@ func add_guy_to_stack() -> void:
 	if guy.has_method("setup"):
 		guy.setup(is_rare)
 
-	# This is where the new guy gets counted.
-	# It happens here because the Spawner knows whether the new guy is rare.
+	# The Spawner knows whether the new guy is rare, so it updates the count.
 	if game_manager != null:
 		game_manager.add_little_guy_count(is_rare)
 
 	if guy.has_method("play_pop_sfx"):
 		guy.play_pop_sfx()
 
-	var target_position := get_stack_position(stack_index)
-
 	guy.global_position = spawn_position
 	guy.z_index = 100 + stack_index
 
 	next_stack_index += 1
 
-	jump_guy_to_position(guy, target_position)
+	jump_guy_to_position(guy, target_position, reaches_ending)
 
 
 func add_starting_guy() -> void:
@@ -135,7 +164,11 @@ func add_starting_guy() -> void:
 	print("Starting guy added at: ", target_position)
 
 
-func jump_guy_to_position(guy: Node2D, target_position: Vector2) -> void:
+func jump_guy_to_position(
+	guy: Node2D,
+	target_position: Vector2,
+	starts_ending: bool = false
+) -> void:
 	var start_position := guy.global_position
 	var peak_position := start_position.lerp(target_position, 0.5)
 	peak_position.y -= jump_height
@@ -162,14 +195,29 @@ func jump_guy_to_position(guy: Node2D, target_position: Vector2) -> void:
 
 			if camera_controller != null:
 				camera_controller.check_camera_page_up(target_position)
+
+			# Only check after the guy has actually reached the stack.
+			if starts_ending:
+				check_for_ending(guy)
 	)
 
 
 func get_stack_position(index: int) -> Vector2:
-	var x := stack_base_position.x + randf_range(-stack_wobble_x, stack_wobble_x)
+	var x := stack_base_position.x + randf_range(
+		-stack_wobble_x,
+		stack_wobble_x
+	)
 	var y := stack_base_position.y - index * guy_spacing_y
 
 	return Vector2(x, y)
+
+
+func _position_reaches_ending(position: Vector2) -> bool:
+	if progress_top_point == null:
+		return false
+
+	# Smaller Y values are higher in Godot.
+	return position.y <= progress_top_point.global_position.y
 
 
 func register_stack_position(position: Vector2) -> void:
@@ -200,8 +248,22 @@ func emit_stack_progress() -> void:
 	stack_progress_changed.emit(get_stack_progress())
 
 
-func quadratic_bezier(a: Vector2, b: Vector2, c: Vector2, t: float) -> Vector2:
+func quadratic_bezier(
+	a: Vector2,
+	b: Vector2,
+	c: Vector2,
+	t: float
+) -> Vector2:
 	var ab := a.lerp(b, t)
 	var bc := b.lerp(c, t)
 
 	return ab.lerp(bc, t)
+
+
+func check_for_ending(highest_little_guy: Node2D) -> void:
+	if ending_cutscene == null or progress_top_point == null:
+		return
+
+	if highest_little_guy.global_position.y <= \
+		progress_top_point.global_position.y:
+		ending_cutscene.start_ending()

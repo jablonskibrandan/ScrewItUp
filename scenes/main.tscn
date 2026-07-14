@@ -16,9 +16,12 @@
 [ext_resource type="Texture2D" uid="uid://cc370k4im3tig" path="res://sprites/upgrade_buttons/little-guy-button-pixilart_2-8x.png" id="9_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://b601uovj0s43w" path="res://sprites/progress_little_guy_marker.png" id="9_progressguy"]
 [ext_resource type="Texture2D" uid="uid://bk8arvw1g8l6e" path="res://sprites/upgrade_buttons/idea-rate-button-pixilart_2-8x.png" id="10_muem4"]
+[ext_resource type="Script" uid="uid://3gj3mgukcota" path="res://scripts/ending_cutscene.gd" id="10_og1vs"]
 [ext_resource type="Script" uid="uid://b345a0lkw5hw1" path="res://scripts/stack_progress_bar.gd" id="10_progressscript"]
+[ext_resource type="Texture2D" uid="uid://b8shc61s2d6cs" path="res://sprites/end_cutscene/lightbulb-pixilart-6x.png" id="11_2wyq8"]
 [ext_resource type="Texture2D" uid="uid://cjwotn2fsyxft" path="res://sprites/upgrade_buttons/little-guy-button-pixilart_1-8x.png" id="11_dp3eg"]
 [ext_resource type="Texture2D" uid="uid://bj0qp2mgy50dn" path="res://sprites/upgrade_buttons/bright-idea-chance-button-pixilart-12x.png" id="12_bright"]
+[ext_resource type="Texture2D" uid="uid://cj6os0lh7ouk4" path="res://sprites/end_cutscene/lit-lightbulb-pixilart-6x.png" id="12_vxglm"]
 [ext_resource type="Texture2D" uid="uid://cnnstugyqgg0j" path="res://sprites/upgrade_buttons/little-guy-button-pixilart_3-8x.png" id="13_gqmmt"]
 [ext_resource type="FontFile" uid="uid://cdkyujordns60" path="res://fonts/atari full.ttf" id="14_jscy8"]
 [ext_resource type="Texture2D" uid="uid://bb2oqqf84ycps" path="res://sprites/upgrade_buttons/auto-buy-button-pixilart-8x.png" id="14_yc10j"]
@@ -142,7 +145,7 @@ position = Vector2(475, 653)
 position = Vector2(476, 609)
 
 [node name="ProgressTopPoint" type="Marker2D" parent="World" unique_id=1787164101]
-position = Vector2(487, -2169)
+position = Vector2(458, -1821)
 
 [node name="Camera2D" type="Camera2D" parent="World" unique_id=877441994 node_paths=PackedStringArray("camera")]
 position = Vector2(480, 420)
@@ -153,7 +156,7 @@ script = ExtResource("2_tefeu")
 camera = NodePath(".")
 top_screen_margin = 100.0
 
-[node name="Spawner" type="Node" parent="World" unique_id=2015348169 node_paths=PackedStringArray("stack_root", "stack_base_point", "guy_spawn_point", "progress_top_point", "starting_little_guy", "game_manager", "camera_controller")]
+[node name="Spawner" type="Node" parent="World" unique_id=2015348169 node_paths=PackedStringArray("stack_root", "stack_base_point", "guy_spawn_point", "progress_top_point", "starting_little_guy", "game_manager", "camera_controller", "ending_cutscene")]
 script = ExtResource("2_jyhfs")
 little_guy_scene = ExtResource("3_tbgi4")
 guy_spacing_y = 32.0
@@ -165,6 +168,7 @@ progress_top_point = NodePath("../ProgressTopPoint")
 starting_little_guy = NodePath("../LittleGuy")
 game_manager = NodePath("../../GameManager")
 camera_controller = NodePath("../Camera2D")
+ending_cutscene = NodePath("../EndingCutscene")
 
 [node name="LittleGuy" parent="World" unique_id=338728597 instance=ExtResource("3_tbgi4")]
 position = Vector2(461.00003, 634)
@@ -232,6 +236,27 @@ mouse_filter = 2
 texture = ExtResource("5_0ld40")
 expand_mode = 1
 stretch_mode = 1
+
+[node name="EndingCutscene" type="Node2D" parent="World" unique_id=1970676153 node_paths=PackedStringArray("first_cutscene_sprite", "second_cutscene_sprite", "progress_top_point")]
+script = ExtResource("10_og1vs")
+first_cutscene_sprite = NodePath("UnlitBulb")
+second_cutscene_sprite = NodePath("LitLightbulbPixilart6x")
+progress_top_point = NodePath("../ProgressTopPoint")
+
+[node name="UnlitBulb" type="Sprite2D" parent="World/EndingCutscene" unique_id=1202051327]
+visible = false
+z_index = -2
+position = Vector2(456.99997, -1868)
+scale = Vector2(0.34, -0.246)
+texture = ExtResource("11_2wyq8")
+
+[node name="LitLightbulbPixilart6x" type="Sprite2D" parent="World/EndingCutscene" unique_id=744838465]
+visible = false
+z_index = -2
+position = Vector2(457.99997, -1859.0001)
+rotation = -6.2831855
+scale = Vector2(-0.32095972, -0.32211035)
+texture = ExtResource("12_vxglm")
 
 [node name="ScreenUI" type="CanvasLayer" parent="." unique_id=1507895780 node_paths=PackedStringArray("spawner", "game_manager", "buy_guy_button", "idea_time_reduce_button", "rare_chance_button", "bright_chance_button", "auto_buy_button", "auto_buy_speed_button", "ideas_label", "bright_ideas_label", "little_guys_label", "idea_time_label", "rare_chance_label", "bright_idea_chance_label", "button_click_sfx")]
 layer = 10
@@ -603,7 +628,7 @@ vertical_alignment = 1
 [node name="GameManager" type="Node" parent="." unique_id=335116798]
 script = ExtResource("2_0wfyh")
 little_guy_linear_growth = 2.0
-little_guy_quadratic_growth = 2.5545999999999998
+little_guy_quadratic_growth = 2.5546
 
 [node name="UIAudio" type="Node2D" parent="." unique_id=869765653]
 
