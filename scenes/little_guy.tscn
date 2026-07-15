@@ -3,19 +3,78 @@
 [ext_resource type="Script" uid="uid://ssaddaxeue2y" path="res://scripts/little_guy.gd" id="1_ppv50"]
 [ext_resource type="Texture2D" uid="uid://dgjptw1so4pt0" path="res://sprites/image_2026-07-02_105344178-removebg-preview_1.png" id="1_qctxp"]
 [ext_resource type="AudioStream" uid="uid://dmmooaawenh4j" path="res://audio/little_guy_pop.mp3" id="3_25crj"]
+[ext_resource type="Texture2D" uid="uid://bh51vb6briqea" path="res://sprites/image_2026-07-02_105615861-removebg-preview.png" id="4_m2bt7"]
 [ext_resource type="AudioStream" uid="uid://c887vdtlrb3jf" path="res://audio/rare_guy_pop.mp3" id="4_oghk0"]
+[ext_resource type="Texture2D" uid="uid://cacwmdmgvpajv" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100338887-removebg-preview.png" id="6_u7lvf"]
+[ext_resource type="Texture2D" uid="uid://cefprmrnunufv" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100338888-removebg-preview.png" id="7_aod52"]
+[ext_resource type="Texture2D" uid="uid://ct3sdhjhbfs3d" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100446000-removebg-preview.png" id="8_jdkuj"]
+[ext_resource type="Texture2D" uid="uid://68ugq3nsl0tp" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100446001-removebg-preview.png" id="9_s8qb7"]
+[ext_resource type="Texture2D" uid="uid://bcpje32umjj2l" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100517969-removebg-preview.png" id="10_x7ksx"]
+[ext_resource type="Texture2D" uid="uid://dugndedidv6ew" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100602711-removebg-preview.png" id="11_5xh1l"]
+[ext_resource type="Texture2D" uid="uid://crsy3d6ln63he" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100725670-removebg-preview.png" id="12_fa8gu"]
+[ext_resource type="Texture2D" uid="uid://wsbwvt5cy0k8" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100752571-removebg-preview.png" id="13_n0ugb"]
+[ext_resource type="Texture2D" uid="uid://bx70c4x6b6vm1" path="res://sprites/Walking_Anim_Screw_It-Up/Firefly_RemoveBackground-removebg-preview-2x.png" id="14_gjpjq"]
+[ext_resource type="Texture2D" uid="uid://03k6asfwp1v7" path="res://sprites/Walking_Anim_Screw_It-Up/image_2026-07-12_094129250-removebg-preview_1-2x.png" id="15_b7ttr"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_l6ilu"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_m2bt7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("1_qctxp")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_u7lvf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_aod52")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_jdkuj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_s8qb7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_x7ksx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_5xh1l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_fa8gu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_n0ugb")
+}],
+"loop": 0,
+"name": &"jumping",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_gjpjq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_b7ttr")
+}],
+"loop": 1,
+"name": &"running",
+"speed": 5.0
+}]
 
 [node name="LittleGuy" type="Node2D" unique_id=338728597 node_paths=PackedStringArray("little_guy_pop", "rare_guy_pop")]
 z_index = 100
-scale = Vector2(3, 3)
 script = ExtResource("1_ppv50")
 little_guy_pop = NodePath("Audio/LittleGuyPop")
 rare_guy_pop = NodePath("Audio/RareGuyPop")
-
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=136963205]
-z_index = 100
-scale = Vector2(0.025, 0.025)
-texture = ExtResource("1_qctxp")
 
 [node name="Audio" type="Node" parent="." unique_id=854340812]
 
@@ -24,3 +83,7 @@ stream = ExtResource("3_25crj")
 
 [node name="RareGuyPop" type="AudioStreamPlayer" parent="Audio" unique_id=2114455650]
 stream = ExtResource("4_oghk0")
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="." unique_id=1774155620]
+sprite_frames = SubResource("SpriteFrames_l6ilu")
+animation = &"idle"

@@ -155,6 +155,5 @@ stretch_mode = 5
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=388581713]
 stream = ExtResource("19_hstxw")
-volume_db = 24.0
 autoplay = true
 parameters/looping = true

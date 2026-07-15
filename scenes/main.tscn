@@ -20,6 +20,7 @@
 [ext_resource type="Script" uid="uid://b345a0lkw5hw1" path="res://scripts/stack_progress_bar.gd" id="10_progressscript"]
 [ext_resource type="Texture2D" uid="uid://b8shc61s2d6cs" path="res://sprites/end_cutscene/lightbulb-pixilart-6x.png" id="11_2wyq8"]
 [ext_resource type="Texture2D" uid="uid://cjwotn2fsyxft" path="res://sprites/upgrade_buttons/little-guy-button-pixilart_1-8x.png" id="11_dp3eg"]
+[ext_resource type="PackedScene" uid="uid://cjf0np2jymnl6" path="res://scenes/main_menu.tscn" id="11_vxglm"]
 [ext_resource type="Texture2D" uid="uid://bj0qp2mgy50dn" path="res://sprites/upgrade_buttons/bright-idea-chance-button-pixilart-12x.png" id="12_bright"]
 [ext_resource type="Texture2D" uid="uid://cj6os0lh7ouk4" path="res://sprites/end_cutscene/lit-lightbulb-pixilart-6x.png" id="12_vxglm"]
 [ext_resource type="Texture2D" uid="uid://cnnstugyqgg0j" path="res://sprites/upgrade_buttons/little-guy-button-pixilart_3-8x.png" id="13_gqmmt"]
@@ -145,7 +146,7 @@ position = Vector2(475, 653)
 position = Vector2(476, 609)
 
 [node name="ProgressTopPoint" type="Marker2D" parent="World" unique_id=1787164101]
-position = Vector2(458, -1821)
+position = Vector2(457, -1804)
 
 [node name="Camera2D" type="Camera2D" parent="World" unique_id=877441994 node_paths=PackedStringArray("camera")]
 position = Vector2(480, 420)
@@ -156,14 +157,15 @@ script = ExtResource("2_tefeu")
 camera = NodePath(".")
 top_screen_margin = 100.0
 
-[node name="Spawner" type="Node" parent="World" unique_id=2015348169 node_paths=PackedStringArray("stack_root", "stack_base_point", "guy_spawn_point", "progress_top_point", "starting_little_guy", "game_manager", "camera_controller", "ending_cutscene")]
+[node name="Spawner" type="Node" parent="World" unique_id=2015348169 node_paths=PackedStringArray("stack_root", "stack_base_point", "guy_spawn_point", "run_target_point", "progress_top_point", "starting_little_guy", "game_manager", "camera_controller", "ending_cutscene")]
 script = ExtResource("2_jyhfs")
 little_guy_scene = ExtResource("3_tbgi4")
 guy_spacing_y = 32.0
 stack_wobble_x = 5.0
 stack_root = NodePath("../StackRoot")
 stack_base_point = NodePath("../SpawnPoint")
-guy_spawn_point = NodePath("../SpawnPoint")
+guy_spawn_point = NodePath("../GuyEntryPoint")
+run_target_point = NodePath("../GuyJumpPoint")
 progress_top_point = NodePath("../ProgressTopPoint")
 starting_little_guy = NodePath("../LittleGuy")
 game_manager = NodePath("../../GameManager")
@@ -171,7 +173,8 @@ camera_controller = NodePath("../Camera2D")
 ending_cutscene = NodePath("../EndingCutscene")
 
 [node name="LittleGuy" parent="World" unique_id=338728597 instance=ExtResource("3_tbgi4")]
-position = Vector2(461.00003, 634)
+position = Vector2(460, 632)
+scale = Vector2(0.25, 0.25)
 
 [node name="MainWorld" type="Node2D" parent="World" unique_id=404955480]
 
@@ -242,6 +245,7 @@ script = ExtResource("10_og1vs")
 first_cutscene_sprite = NodePath("UnlitBulb")
 second_cutscene_sprite = NodePath("LitLightbulbPixilart6x")
 progress_top_point = NodePath("../ProgressTopPoint")
+main_menu_scene = ExtResource("11_vxglm")
 
 [node name="UnlitBulb" type="Sprite2D" parent="World/EndingCutscene" unique_id=1202051327]
 visible = false
@@ -258,7 +262,13 @@ rotation = -6.2831855
 scale = Vector2(-0.32095972, -0.32211035)
 texture = ExtResource("12_vxglm")
 
-[node name="ScreenUI" type="CanvasLayer" parent="." unique_id=1507895780 node_paths=PackedStringArray("spawner", "game_manager", "buy_guy_button", "idea_time_reduce_button", "rare_chance_button", "bright_chance_button", "auto_buy_button", "auto_buy_speed_button", "ideas_label", "bright_ideas_label", "little_guys_label", "idea_time_label", "rare_chance_label", "bright_idea_chance_label", "button_click_sfx")]
+[node name="GuyEntryPoint" type="Marker2D" parent="World" unique_id=2047527193]
+position = Vector2(954, 624)
+
+[node name="GuyJumpPoint" type="Marker2D" parent="World" unique_id=1148425098]
+position = Vector2(673, 633)
+
+[node name="ScreenUI" type="CanvasLayer" parent="." unique_id=1507895780 node_paths=PackedStringArray("spawner", "game_manager", "buy_guy_button", "idea_time_reduce_button", "rare_chance_button", "bright_chance_button", "auto_buy_button", "auto_buy_speed_button", "ideas_label", "bright_ideas_label", "little_guys_label", "rare_guys_label", "idea_time_label", "rare_chance_label", "bright_idea_chance_label", "button_click_sfx")]
 layer = 10
 script = ExtResource("4_tbgi4")
 spawner = NodePath("../World/Spawner")
@@ -272,6 +282,7 @@ auto_buy_speed_button = NodePath("UIRoot/UpgradePanel/MarginContainer/UpgradeVBo
 ideas_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/IdeasLabel")
 bright_ideas_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/BrightIdeasLabel")
 little_guys_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/StackLabel")
+rare_guys_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/RareGuyLabel")
 idea_time_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/IdeaSpeedLabel")
 rare_chance_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/RareGuyChanceLabel")
 bright_idea_chance_label = NodePath("UIRoot/StatsPanel/MarginContainer/StatsVBox/BrightIdeaChanceLabel")
@@ -326,39 +337,51 @@ theme_override_constants/separation = 10
 
 [node name="IdeasLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=440745489]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("14_jscy8")
 text = "Ideas: 0"
 label_settings = SubResource("LabelSettings_big")
 
 [node name="BrightIdeasLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=2054107978]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("14_jscy8")
 text = "Bright Ideas: 0"
 label_settings = SubResource("LabelSettings_big")
 
 [node name="StackLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=1569286012]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("14_jscy8")
 text = "Little Guys: 1"
+label_settings = SubResource("LabelSettings_big")
+
+[node name="RareGuyLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=426632020]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("14_jscy8")
+text = "Rare Guys: 0"
 label_settings = SubResource("LabelSettings_big")
 
 [node name="IdeaSpeedLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=1935714509]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("14_jscy8")
 text = "Idea Time: 5.00s"
 label_settings = SubResource("LabelSettings_big")
 
 [node name="RareGuyChanceLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=1167656782]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("14_jscy8")
 text = "Rare Guy Chance: 1%"
 label_settings = SubResource("LabelSettings_big")
 
 [node name="BrightIdeaChanceLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=1785499476]
 layout_mode = 2
-text = "Rare Guy Chance: 1%"
+theme_override_fonts/font = ExtResource("14_jscy8")
+text = "Bright Idea Chance: 1%"
 label_settings = SubResource("LabelSettings_big")
 
 [node name="ProgressBarPanel" type="Control" parent="ScreenUI/UIRoot" unique_id=706491609 node_paths=PackedStringArray("spawner")]
 anchors_preset = 0
-offset_left = 2.0
+offset_left = 50.0
 offset_top = 384.0
-offset_right = 100.0
+offset_right = 148.0
 offset_bottom = 854.0
 mouse_filter = 2
 script = ExtResource("10_progressscript")
@@ -389,10 +412,10 @@ stretch_mode = 5
 
 [node name="UpgradePanel" type="PanelContainer" parent="ScreenUI/UIRoot" unique_id=1646751361]
 layout_mode = 0
-offset_left = 1456.0
+offset_left = 1356.0
 offset_top = 28.0
-offset_right = 1892.0
-offset_bottom = 856.0
+offset_right = 1792.0
+offset_bottom = 964.0
 scale = Vector2(1.12, 1.0799994)
 theme_override_styles/panel = SubResource("StyleBoxFlat_ui_panel")
 
@@ -627,8 +650,8 @@ vertical_alignment = 1
 
 [node name="GameManager" type="Node" parent="." unique_id=335116798]
 script = ExtResource("2_0wfyh")
-little_guy_linear_growth = 2.0
-little_guy_quadratic_growth = 2.5546
+little_guy_linear_growth = 1.5
+little_guy_quadratic_growth = 1.5
 
 [node name="UIAudio" type="Node2D" parent="." unique_id=869765653]
 
@@ -637,4 +660,5 @@ stream = ExtResource("7_o6xl0")
 
 [node name="MainMusicLoop" type="AudioStreamPlayer" parent="." unique_id=1050231673]
 stream = SubResource("AudioStreamMP3_tipki")
+volume_db = -2.0
 autoplay = true
