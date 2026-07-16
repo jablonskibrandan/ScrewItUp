@@ -1,12 +1,14 @@
 [gd_scene format=3 uid="uid://byt8bu3al3ssh"]
 
 [ext_resource type="Script" uid="uid://ssaddaxeue2y" path="res://scripts/little_guy.gd" id="1_ppv50"]
-[ext_resource type="Texture2D" uid="uid://dgjptw1so4pt0" path="res://sprites/image_2026-07-02_105344178-removebg-preview_1.png" id="1_qctxp"]
 [ext_resource type="AudioStream" uid="uid://dmmooaawenh4j" path="res://audio/little_guy_pop.mp3" id="3_25crj"]
-[ext_resource type="Texture2D" uid="uid://bh51vb6briqea" path="res://sprites/image_2026-07-02_105615861-removebg-preview.png" id="4_m2bt7"]
+[ext_resource type="Texture2D" uid="uid://cjrjw731mfwsh" path="res://sprites/holding_anim_screw_it_up/image_2026-07-02_105251328-removebg-preview_7.png" id="4_aod52"]
 [ext_resource type="AudioStream" uid="uid://c887vdtlrb3jf" path="res://audio/rare_guy_pop.mp3" id="4_oghk0"]
+[ext_resource type="Texture2D" uid="uid://bt5ackifun5g7" path="res://sprites/holding_anim_screw_it_up/image_2026-07-02_105344178-removebg-preview_1.png" id="5_jdkuj"]
+[ext_resource type="Texture2D" uid="uid://dnjexby3s6c56" path="res://sprites/idle_anim_screw_it_up/image_2026-07-02_105615861-removebg-preview.png" id="6_s8qb7"]
 [ext_resource type="Texture2D" uid="uid://cacwmdmgvpajv" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100338887-removebg-preview.png" id="6_u7lvf"]
 [ext_resource type="Texture2D" uid="uid://cefprmrnunufv" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100338888-removebg-preview.png" id="7_aod52"]
+[ext_resource type="Texture2D" uid="uid://dc31aa4bupsau" path="res://sprites/idle_anim_screw_it_up/image_2026-07-02_105650486-removebg-preview.png" id="7_x7ksx"]
 [ext_resource type="Texture2D" uid="uid://ct3sdhjhbfs3d" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100446000-removebg-preview.png" id="8_jdkuj"]
 [ext_resource type="Texture2D" uid="uid://68ugq3nsl0tp" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100446001-removebg-preview.png" id="9_s8qb7"]
 [ext_resource type="Texture2D" uid="uid://bcpje32umjj2l" path="res://sprites/jumping_anim_screw_it_Up/image_2026-07-12_100517969-removebg-preview.png" id="10_x7ksx"]
@@ -20,10 +22,21 @@
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("4_m2bt7")
+"texture": ExtResource("4_aod52")
 }, {
 "duration": 1.0,
-"texture": ExtResource("1_qctxp")
+"texture": ExtResource("5_jdkuj")
+}],
+"loop": 1,
+"name": &"holding",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_s8qb7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_x7ksx")
 }],
 "loop": 1,
 "name": &"idle",
@@ -86,4 +99,4 @@ stream = ExtResource("4_oghk0")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="." unique_id=1774155620]
 sprite_frames = SubResource("SpriteFrames_l6ilu")
-animation = &"idle"
+animation = &"holding"

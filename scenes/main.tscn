@@ -191,7 +191,7 @@ scale = Vector2(6.04, 2.521286)
 texture = ExtResource("7_yc10j")
 
 [node name="EndArea" type="Sprite2D" parent="World/MainWorld" unique_id=727642458]
-position = Vector2(467.99997, -125)
+position = Vector2(472, -125)
 rotation = -3.1415927
 scale = Vector2(2.1211927, 3.9855673)
 texture = ExtResource("8_jscy8")
@@ -341,28 +341,28 @@ theme_override_fonts/font = ExtResource("14_jscy8")
 text = "Ideas: 0"
 label_settings = SubResource("LabelSettings_big")
 
-[node name="BrightIdeasLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=2054107978]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("14_jscy8")
-text = "Bright Ideas: 0"
-label_settings = SubResource("LabelSettings_big")
-
 [node name="StackLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=1569286012]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("14_jscy8")
 text = "Little Guys: 1"
 label_settings = SubResource("LabelSettings_big")
 
-[node name="RareGuyLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=426632020]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("14_jscy8")
-text = "Rare Guys: 0"
-label_settings = SubResource("LabelSettings_big")
-
 [node name="IdeaSpeedLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=1935714509]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("14_jscy8")
 text = "Idea Time: 5.00s"
+label_settings = SubResource("LabelSettings_big")
+
+[node name="BrightIdeasLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=2054107978]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("14_jscy8")
+text = "Bright Ideas: 0"
+label_settings = SubResource("LabelSettings_big")
+
+[node name="RareGuyLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=426632020]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("14_jscy8")
+text = "Rare Guys: 0"
 label_settings = SubResource("LabelSettings_big")
 
 [node name="RareGuyChanceLabel" type="Label" parent="ScreenUI/UIRoot/StatsPanel/MarginContainer/StatsVBox" unique_id=1167656782]

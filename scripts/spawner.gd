@@ -41,6 +41,9 @@ var next_stack_index: int = 1
 var stack_base_position: Vector2
 var highest_stack_y: float = 0.0
 
+# The top Little Guy is idle. Everyone below the top is holding.
+var current_top_guy: Node2D = null
+
 # Blocks manual buying and auto-buying while a guy is moving.
 var spawn_in_progress: bool = false
 
@@ -89,6 +92,12 @@ func _ready() -> void:
 
 	if starting_little_guy != null:
 		stack_base_position = starting_little_guy.global_position
+		current_top_guy = starting_little_guy
+
+		# The starting Little Guy is initially the top of the stack.
+		if current_top_guy.has_method("play_idle_animation"):
+			current_top_guy.play_idle_animation()
+
 	elif stack_base_point != null:
 		stack_base_position = stack_base_point.global_position
 	else:
@@ -135,15 +144,15 @@ func add_guy_to_stack() -> void:
 		push_error("Run Target Point is not assigned.")
 		return
 
-	var stack_index := next_stack_index
-	var target_position := get_stack_position(stack_index)
-	var reaches_ending := _position_reaches_ending(target_position)
+	var stack_index = next_stack_index
+	var target_position = get_stack_position(stack_index)
+	var reaches_ending = _position_reaches_ending(target_position)
 
 	if reaches_ending:
 		target_position.y = progress_top_point.global_position.y
 		ending_locked = true
 
-	var guy := little_guy_scene.instantiate() as Node2D
+	var guy = little_guy_scene.instantiate() as Node2D
 
 	if guy == null:
 		push_error(
@@ -161,7 +170,7 @@ func add_guy_to_stack() -> void:
 
 	stack_root.add_child(guy)
 
-	var is_rare := false
+	var is_rare = false
 
 	if game_manager != null:
 		is_rare = game_manager.roll_for_rare_guy()
@@ -193,8 +202,16 @@ func add_guy_to_stack() -> void:
 
 	guy.global_position = target_position
 
-	if guy.has_method("play_idle_animation"):
-		guy.play_idle_animation()
+	# The previous top Little Guy now has someone standing on it.
+	if current_top_guy != null and is_instance_valid(current_top_guy):
+		if current_top_guy.has_method("play_holding_animation"):
+			current_top_guy.play_holding_animation()
+
+	# The new Little Guy becomes the top and stays idle.
+	current_top_guy = guy
+
+	if current_top_guy.has_method("play_idle_animation"):
+		current_top_guy.play_idle_animation()
 
 	# Count the exact same rarity value that was used for the appearance.
 	if game_manager != null:
@@ -226,8 +243,8 @@ func run_guy_to_jump_point(guy: Node2D) -> void:
 	if guy.has_method("play_run_animation"):
 		guy.play_run_animation()
 
-	var target_position := run_target_point.global_position
-	var tween := create_tween()
+	var target_position = run_target_point.global_position
+	var tween = create_tween()
 
 	tween.tween_property(
 		guy,
@@ -252,11 +269,11 @@ func jump_guy_to_position(
 	if guy.has_method("play_jump_animation"):
 		guy.play_jump_animation()
 
-	var start_position := guy.global_position
-	var peak_position := start_position.lerp(target_position, 0.5)
+	var start_position = guy.global_position
+	var peak_position = start_position.lerp(target_position, 0.5)
 	peak_position.y -= jump_height
 
-	var tween := create_tween()
+	var tween = create_tween()
 
 	tween.tween_method(
 		func(t: float) -> void:
@@ -285,8 +302,8 @@ func add_starting_guy() -> void:
 		push_error("Little Guy Scene is not assigned.")
 		return
 
-	var stack_index := 0
-	var guy := little_guy_scene.instantiate() as Node2D
+	var stack_index = 0
+	var guy = little_guy_scene.instantiate() as Node2D
 
 	if guy == null:
 		push_error(
@@ -304,6 +321,9 @@ func add_starting_guy() -> void:
 	if guy.has_method("play_idle_animation"):
 		guy.play_idle_animation()
 
+	# This dynamically created guy is the initial top of the stack.
+	current_top_guy = guy
+
 	guy.global_position = target_position
 	guy.z_index = 100 + stack_index
 
@@ -312,7 +332,7 @@ func add_starting_guy() -> void:
 
 
 func get_stack_position(index: int) -> Vector2:
-	var x := stack_base_position.x + randf_range(
+	var x = stack_base_position.x + randf_range(
 		-stack_wobble_x,
 		stack_wobble_x
 	)
@@ -343,7 +363,7 @@ func get_stack_progress() -> float:
 	else:
 		top_y = stack_base_position.y - progress_goal_height
 
-	var total_height := stack_base_position.y - top_y
+	var total_height = stack_base_position.y - top_y
 
 	if total_height <= 0.0:
 		return 0.0
@@ -367,8 +387,8 @@ func quadratic_bezier(
 	c: Vector2,
 	t: float
 ) -> Vector2:
-	var ab := a.lerp(b, t)
-	var bc := b.lerp(c, t)
+	var ab = a.lerp(b, t)
+	var bc = b.lerp(c, t)
 
 	return ab.lerp(bc, t)
 

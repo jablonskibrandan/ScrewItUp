@@ -8,9 +8,9 @@ const BRIGHT_IDEA_LAMP: Texture2D = preload("uid://cfurqvmpb1o65")
 const IDLE_ANIMATION: StringName = &"idle"
 const RUNNING_ANIMATION: StringName = &"running"
 const JUMPING_ANIMATION: StringName = &"jumping"
+const HOLDING_ANIMATION: StringName = &"holding"
 
-# Your stack spacing is 32 pixels, so 32 keeps every animation at a
-# consistent size regardless of the source image dimensions.
+# Every animation is resized to this displayed height.
 @export var target_sprite_height: float = 32.0
 
 @export var little_guy_pop: AudioStreamPlayer
@@ -21,16 +21,15 @@ var is_rare: bool = false
 
 
 func _ready() -> void:
-	# The packed Little Guy scene previously had a root scale of 3,3.
-	# Force every existing and newly spawned instance back to world scale 1.
+	# Keep the root at normal world scale.
 	scale = Vector2.ONE
 
 	add_to_group("little_guys")
 	_configure_animation_loops()
 	play_idle_animation()
 
-	var idea_callable := Callable(self, "on_idea_lamp")
-	var bright_callable := Callable(self, "on_bright_idea_lamp")
+	var idea_callable = Callable(self, "on_idea_lamp")
+	var bright_callable = Callable(self, "on_bright_idea_lamp")
 
 	if not ManagerCommunication.little_guy_idea_lamp.is_connected(
 		idea_callable
@@ -48,8 +47,8 @@ func _ready() -> void:
 
 
 func _exit_tree() -> void:
-	var idea_callable := Callable(self, "on_idea_lamp")
-	var bright_callable := Callable(self, "on_bright_idea_lamp")
+	var idea_callable = Callable(self, "on_idea_lamp")
+	var bright_callable = Callable(self, "on_bright_idea_lamp")
 
 	if ManagerCommunication.little_guy_idea_lamp.is_connected(
 		idea_callable
@@ -97,6 +96,12 @@ func _configure_animation_loops() -> void:
 			false
 		)
 
+	if sprite.sprite_frames.has_animation(HOLDING_ANIMATION):
+		sprite.sprite_frames.set_animation_loop(
+			HOLDING_ANIMATION,
+			true
+		)
+
 
 func play_idle_animation() -> void:
 	_play_animation_at_target_height(IDLE_ANIMATION)
@@ -108,6 +113,10 @@ func play_run_animation() -> void:
 
 func play_jump_animation() -> void:
 	_play_animation_at_target_height(JUMPING_ANIMATION)
+
+
+func play_holding_animation() -> void:
+	_play_animation_at_target_height(HOLDING_ANIMATION)
 
 
 func _play_animation_at_target_height(
@@ -126,7 +135,7 @@ func _play_animation_at_target_height(
 	sprite.play(animation_name)
 	sprite.frame = 0
 
-	var frame_texture := sprite.sprite_frames.get_frame_texture(
+	var frame_texture = sprite.sprite_frames.get_frame_texture(
 		animation_name,
 		0
 	)
@@ -134,12 +143,12 @@ func _play_animation_at_target_height(
 	if frame_texture == null:
 		return
 
-	var source_height := float(frame_texture.get_height())
+	var source_height = float(frame_texture.get_height())
 
 	if source_height <= 0.0:
 		return
 
-	var correct_scale := target_sprite_height / source_height
+	var correct_scale = target_sprite_height / source_height
 	sprite.scale = Vector2(correct_scale, correct_scale)
 
 
@@ -150,7 +159,7 @@ func _spawn_lamp(
 	if texture == null:
 		return
 
-	var lamp_sprite := Sprite2D.new()
+	var lamp_sprite = Sprite2D.new()
 	lamp_sprite.texture = texture
 	lamp_sprite.centered = true
 	lamp_sprite.z_as_relative = false
@@ -158,36 +167,36 @@ func _spawn_lamp(
 
 	get_tree().current_scene.add_child(lamp_sprite)
 
-	var random_x := randf_range(-4.0, 4.0)
-	var random_y := randf_range(-3.0, 2.0)
-	var head_offset := Vector2(
+	var random_x = randf_range(-4.0, 4.0)
+	var random_y = randf_range(-3.0, 2.0)
+	var head_offset = Vector2(
 		random_x,
 		-(target_sprite_height * 0.7) + random_y
 	)
 
 	lamp_sprite.global_position = global_position + head_offset
 
-	var lamp_texture_height := float(texture.get_height())
+	var lamp_texture_height = float(texture.get_height())
 
 	if lamp_texture_height > 0.0:
-		var target_lamp_height := (
+		var target_lamp_height = (
 			target_sprite_height
 			* randf_range(0.85, 1.1)
 		)
-		var lamp_scale := target_lamp_height / lamp_texture_height
+		var lamp_scale = target_lamp_height / lamp_texture_height
 		lamp_sprite.scale = Vector2(lamp_scale, lamp_scale)
 	else:
 		lamp_sprite.scale = Vector2(0.25, 0.25)
 
 	lamp_sprite.rotation_degrees = randf_range(-8.0, 8.0)
 
-	var float_direction := Vector2(
+	var float_direction = Vector2(
 		randf_range(-4.0, 4.0),
 		-18.0
 	)
-	var duration := randf_range(0.45, 0.7)
+	var duration = randf_range(0.45, 0.7)
 
-	var tween := lamp_sprite.create_tween()
+	var tween = lamp_sprite.create_tween()
 
 	tween.tween_property(
 		lamp_sprite,

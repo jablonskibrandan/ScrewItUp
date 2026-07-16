@@ -33,11 +33,11 @@ func check_camera_page_up(new_guy_position: Vector2) -> void:
 	if camera == null:
 		return
 
-	var visible_height := get_visible_screen_height_in_world_units()
+	var visible_height = get_visible_screen_height_in_world_units()
 
-	var camera_top_y := camera_target_y - visible_height / 2.0
-	var camera_bottom_y := camera_target_y + visible_height / 2.0
-	var trigger_y := camera_top_y + top_screen_margin
+	var camera_top_y = camera_target_y - visible_height / 2.0
+	var camera_bottom_y = camera_target_y + visible_height / 2.0
+	var trigger_y = camera_top_y + top_screen_margin
 
 	print("--- CAMERA CHECK ---")
 	print("Guy Y: ", new_guy_position.y)
@@ -55,9 +55,9 @@ func scroll_camera_so_guy_is_near_bottom(guy_position: Vector2) -> void:
 	if camera_is_moving:
 		return
 
-	var visible_height := get_visible_screen_height_in_world_units()
+	var visible_height = get_visible_screen_height_in_world_units()
 
-	var desired_camera_y := guy_position.y + bottom_screen_margin - visible_height / 2.0
+	var desired_camera_y = guy_position.y + bottom_screen_margin - visible_height / 2.0
 
 	# Important: never scroll downward.
 	# In Godot, lower Y means higher up.
@@ -72,7 +72,7 @@ func scroll_camera_so_guy_is_near_bottom(guy_position: Vector2) -> void:
 
 	print("Scrolling camera to Y: ", camera_target_y)
 
-	var tween := create_tween()
+	var tween = create_tween()
 	tween.tween_property(
 		camera,
 		"global_position:y",
@@ -91,7 +91,7 @@ func get_visible_screen_height_in_world_units() -> float:
 	if camera == null:
 		return 0.0
 
-	var viewport_height := get_viewport().get_visible_rect().size.y
+	var viewport_height = get_viewport().get_visible_rect().size.y
 
 	if camera.zoom.y == 0:
 		return viewport_height

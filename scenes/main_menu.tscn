@@ -62,8 +62,8 @@ grow_vertical = 2
 script = ExtResource("1_main")
 
 [node name="Titlecard" type="AnimatedSprite2D" parent="." unique_id=784439980]
-position = Vector2(929, 140.00003)
-scale = Vector2(0.7497441, 0.64344263)
+position = Vector2(929, 168)
+scale = Vector2(1.167, 1)
 sprite_frames = SubResource("SpriteFrames_0cwvh")
 animation = &"title_anim"
 autoplay = "title_anim"
@@ -120,11 +120,12 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = 505.0
-offset_top = 328.0
-offset_right = 1345.0
-offset_bottom = 938.0
+offset_left = 76.0
+offset_top = 377.0
+offset_right = 916.0
+offset_bottom = 987.0
 grow_horizontal = 2
+scale = Vector2(2, 2)
 theme_override_constants/separation = 24
 
 [node name="PlayButton" type="TextureButton" parent="MenuContent/VBoxContainer" unique_id=1915173432]

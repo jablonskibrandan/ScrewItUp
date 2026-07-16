@@ -11,5 +11,5 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	time += delta
 
-	var sway := sin(time * TAU * sway_speed)
+	var sway = sin(time * TAU * sway_speed)
 	rotation_degrees = sway * sway_degrees

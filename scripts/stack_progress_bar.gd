@@ -20,7 +20,7 @@ func _ready() -> void:
 		print("StackProgressBar could not find Spawner")
 		return
 
-	var progress_callable := Callable(self, "set_progress")
+	var progress_callable = Callable(self, "set_progress")
 	if not spawner.stack_progress_changed.is_connected(progress_callable):
 		spawner.stack_progress_changed.connect(progress_callable)
 
@@ -33,8 +33,8 @@ func set_progress(progress: float) -> void:
 
 	progress = clamp(progress, 0.0, 1.0)
 
-	var bar_top := progress_bar_image.position.y + top_padding
-	var bar_bottom := progress_bar_image.position.y + progress_bar_image.size.y - bottom_padding
+	var bar_top = progress_bar_image.position.y + top_padding
+	var bar_bottom = progress_bar_image.position.y + progress_bar_image.size.y - bottom_padding
 	var marker_y = lerp(bar_bottom, bar_top, progress)
 
 	progress_guy_marker.position.x = progress_bar_image.position.x + (progress_bar_image.size.x - progress_guy_marker.size.x) / 2.0

@@ -34,11 +34,19 @@ func _ready() -> void:
 	_connect_game_manager_signals()
 	_connect_spawner_signals()
 
+	# Hide the Rare Chance upgrade and stat label until the first Rare Guy.
 	if rare_chance_button != null:
 		rare_chance_button.visible = game_manager.has_found_rare_guy
 
+	if rare_chance_label != null:
+		rare_chance_label.visible = game_manager.has_found_rare_guy
+
+	# Hide the Bright Idea upgrade and stat label until the first Bright Idea.
 	if bright_chance_button != null:
 		bright_chance_button.visible = game_manager.has_found_bright_idea
+
+	if bright_idea_chance_label != null:
+		bright_idea_chance_label.visible = game_manager.has_found_bright_idea
 
 	# Only used if the game is changed to start with zero guys.
 	if game_manager.get_amt_little_guys() <= 0:
@@ -123,8 +131,6 @@ func on_little_guy_purchased() -> void:
 	if spawner != null:
 		spawner.add_guy_to_stack()
 
-	# add_guy_to_stack locks the Spawner before reaching its first await,
-	# so this immediately shows the disabled purchase button.
 	update_ui()
 
 
@@ -178,12 +184,18 @@ func on_rare_guy_unlocked() -> void:
 	if rare_chance_button != null:
 		rare_chance_button.visible = true
 
+	if rare_chance_label != null:
+		rare_chance_label.visible = true
+
 	update_ui()
 
 
 func on_bright_idea_unlocked() -> void:
 	if bright_chance_button != null:
 		bright_chance_button.visible = true
+
+	if bright_idea_chance_label != null:
+		bright_idea_chance_label.visible = true
 
 	update_ui()
 
@@ -207,10 +219,16 @@ func _update_labels() -> void:
 		ideas_label.text = "Ideas: %d" % game_manager.get_ideas()
 
 	if bright_ideas_label != null:
-		bright_ideas_label.text = (
-			"Bright Ideas: %d"
-			% game_manager.get_bright_ideas()
-		)
+		var has_bright_ideas := game_manager.get_bright_ideas() > 0
+
+		bright_ideas_label.visible = has_bright_ideas
+
+		if has_bright_ideas:
+			bright_ideas_label.text = (
+				"Bright Ideas: %d"
+				% game_manager.get_bright_ideas()
+			)
+			
 
 	if little_guys_label != null:
 		little_guys_label.text = (
@@ -219,10 +237,15 @@ func _update_labels() -> void:
 		)
 
 	if rare_guys_label != null:
-		rare_guys_label.text = (
-			"Rare Guys: %d"
-			% game_manager.get_amt_rare_guys()
-		)
+		var has_rare_guys := game_manager.get_amt_rare_guys() > 0
+
+		rare_guys_label.visible = has_rare_guys
+
+		if has_rare_guys:
+			rare_guys_label.text = (
+				"Rare Guys: %d"
+				% game_manager.get_amt_rare_guys()
+			)
 
 	if idea_time_label != null:
 		idea_time_label.text = (
@@ -231,16 +254,24 @@ func _update_labels() -> void:
 		)
 
 	if rare_chance_label != null:
-		rare_chance_label.text = (
-			"Rare Chance Rate: %.2f %%"
-			% game_manager.get_rare_guy_chance_percent()
-		)
+		rare_chance_label.visible = game_manager.has_found_rare_guy
+
+		if rare_chance_label.visible:
+			rare_chance_label.text = (
+				"Rare Chance Rate: %.2f %%"
+				% game_manager.get_rare_guy_chance_percent()
+			)
 
 	if bright_idea_chance_label != null:
-		bright_idea_chance_label.text = (
-			"Bright Idea Chance: %.2f %%"
-			% game_manager.get_bright_idea_chance_percent()
+		bright_idea_chance_label.visible = (
+			game_manager.has_found_bright_idea
 		)
+
+		if bright_idea_chance_label.visible:
+			bright_idea_chance_label.text = (
+				"Bright Idea Chance: %.2f %%"
+				% game_manager.get_bright_idea_chance_percent()
+			)
 
 
 func _update_upgrade_buttons() -> void:
@@ -290,31 +321,71 @@ func _update_upgrade_buttons() -> void:
 
 	if rare_chance_button != null:
 		var rare_cost := game_manager.get_rare_chance_cost()
-		_set_cost_text(rare_chance_button, rare_cost)
-		rare_chance_button.tooltip_text = (
-			"Rare Guy chance: %.2f%%\nCost: %d ideas"
-			% [
+		var rare_maxed := game_manager.is_rare_guy_chance_maxed()
+
+		if rare_maxed:
+			_set_status_text(rare_chance_button, "MAX")
+			rare_chance_button.disabled = true
+			rare_chance_button.modulate = Color(
+				0.45,
+				0.45,
+				0.45,
+				1.0
+			)
+			rare_chance_button.tooltip_text = (
+				"Rare Guy chance is at the maximum of 50%."
+			)
+		else:
+			_set_cost_text(rare_chance_button, rare_cost)
+			rare_chance_button.modulate = Color.WHITE
+			rare_chance_button.tooltip_text = (
+				"Rare Guy chance: %.2f%% -> %.2f%%\n"
+				+ "Cost: %d ideas"
+			) % [
 				game_manager.get_rare_guy_chance_percent(),
+				min(
+					50.0,
+					game_manager.get_rare_guy_chance_percent() + 1.0
+				),
 				rare_cost
 			]
-		)
-		rare_chance_button.disabled = (
-			not game_manager.can_afford_ideas(rare_cost)
-		)
+			rare_chance_button.disabled = (
+				not game_manager.can_afford_ideas(rare_cost)
+			)
 
 	if bright_chance_button != null:
 		var bright_cost := game_manager.get_bright_chance_cost()
-		_set_cost_text(bright_chance_button, bright_cost)
-		bright_chance_button.tooltip_text = (
-			"Bright Idea chance: %.2f%%\nCost: %d ideas"
-			% [
+		var bright_maxed := game_manager.is_bright_idea_chance_maxed()
+
+		if bright_maxed:
+			_set_status_text(bright_chance_button, "MAX")
+			bright_chance_button.disabled = true
+			bright_chance_button.modulate = Color(
+				0.45,
+				0.45,
+				0.45,
+				1.0
+			)
+			bright_chance_button.tooltip_text = (
+				"Bright Idea chance is at the maximum of 50%."
+			)
+		else:
+			_set_cost_text(bright_chance_button, bright_cost)
+			bright_chance_button.modulate = Color.WHITE
+			bright_chance_button.tooltip_text = (
+				"Bright Idea chance: %.2f%% -> %.2f%%\n"
+				+ "Cost: %d ideas"
+			) % [
 				game_manager.get_bright_idea_chance_percent(),
+				min(
+					50.0,
+					game_manager.get_bright_idea_chance_percent() + 1.0
+				),
 				bright_cost
 			]
-		)
-		bright_chance_button.disabled = (
-			not game_manager.can_afford_ideas(bright_cost)
-		)
+			bright_chance_button.disabled = (
+				not game_manager.can_afford_ideas(bright_cost)
+			)
 
 
 func _update_auto_buy_ui() -> void:
