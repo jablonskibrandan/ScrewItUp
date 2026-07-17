@@ -258,7 +258,7 @@ func _update_labels() -> void:
 
 		if rare_chance_label.visible:
 			rare_chance_label.text = (
-				"Rare Chance Rate: %.2f %%"
+				"Rare Guy Chance: %.2f %%"
 				% game_manager.get_rare_guy_chance_percent()
 			)
 
@@ -393,19 +393,47 @@ func _update_auto_buy_ui() -> void:
 		return
 
 	if game_manager.has_auto_buyer:
-		auto_buy_button.visible = false
+		# Keep the original Auto Buy button visible so there is no empty slot.
+		auto_buy_button.visible = true
+		auto_buy_button.disabled = true
+		auto_buy_button.modulate = Color(
+			0.45,
+			0.45,
+			0.45,
+			1.0
+		)
+
+		_set_status_text(auto_buy_button, "MAX")
+
+		auto_buy_button.tooltip_text = (
+			"Auto Buyer has already been unlocked."
+		)
+
+		# Show the Auto Buy Rate upgrade beneath it.
 		auto_buy_speed_button.visible = true
 
 		var speed_cost := game_manager.get_auto_buy_speed_cost()
 
 		if speed_cost == 0:
 			_set_status_text(auto_buy_speed_button, "MAX")
+			auto_buy_speed_button.disabled = true
+			auto_buy_speed_button.modulate = Color(
+				0.45,
+				0.45,
+				0.45,
+				1.0
+			)
+
 			auto_buy_speed_button.tooltip_text = (
 				"Auto Buyer is already at maximum speed."
 			)
-			auto_buy_speed_button.disabled = true
 		else:
 			_set_cost_text(auto_buy_speed_button, speed_cost)
+			auto_buy_speed_button.disabled = (
+				not game_manager.can_afford_ideas(speed_cost)
+			)
+			auto_buy_speed_button.modulate = Color.WHITE
+
 			auto_buy_speed_button.tooltip_text = (
 				"Auto Buyer: %.1fs to %.1fs\nCost: %d ideas"
 				% [
@@ -418,19 +446,23 @@ func _update_auto_buy_ui() -> void:
 					speed_cost
 				]
 			)
-			auto_buy_speed_button.disabled = (
-				not game_manager.can_afford_ideas(speed_cost)
-			)
 	else:
+		# Auto Buy has not been unlocked yet.
 		auto_buy_button.visible = true
+		auto_buy_button.disabled = false
+		auto_buy_button.modulate = Color.WHITE
+
 		auto_buy_speed_button.visible = false
 
 		var unlock_cost := game_manager.get_auto_buyer_cost()
+
 		_set_cost_text(auto_buy_button, unlock_cost)
+
 		auto_buy_button.tooltip_text = (
 			"Unlock automatic Little Guy purchases.\n"
 			+ "Cost: %d ideas" % unlock_cost
 		)
+
 		auto_buy_button.disabled = (
 			not game_manager.can_afford_ideas(unlock_cost)
 		)

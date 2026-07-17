@@ -27,10 +27,10 @@ var idea_time_reduce_amount: float = 0.25
 var min_idea_production_time: float = 1.5
 
 # Chances are stored as decimals: 0.01 = 1%, 0.50 = 50%.
-var bright_idea_chance: float = 0.01
-var bright_idea_chance_increase: float = 0.01
-var rare_guy_chance: float = 0.01
-var rare_guy_chance_increase: float = 0.01
+var bright_idea_chance: float = 0.05
+var bright_idea_chance_increase: float = 0.03
+var rare_guy_chance: float = 0.05
+var rare_guy_chance_increase: float = 0.03
 
 const MAX_BRIGHT_IDEA_CHANCE: float = 0.50
 const MAX_RARE_GUY_CHANCE: float = 0.50
@@ -41,7 +41,7 @@ var has_found_bright_idea: bool = false
 @export_category("Little Guy Polynomial Cost")
 @export var little_guy_base_cost: float = 1.0
 @export_range(0.0, 1000.0, 0.01) var little_guy_linear_growth: float = 0.25
-@export_range(0.0, 100.0, 0.0001) var little_guy_quadratic_growth: float = 0.01
+@export_range(0.0, 100.0, 0.0001) var little_guy_quadratic_growth: float = 0.008
 
 # Only purchased Little Guys are counted here.
 var little_guys_purchased: int = 0
@@ -196,7 +196,6 @@ func get_amt_rare_guys() -> int:
 
 func set_amt_little_guys(amt: int) -> void:
 	amt_little_guys = max(0, amt)
-	little_guys_purchased = max(0, amt_little_guys - 1)
 	costs_changed.emit()
 
 
@@ -210,15 +209,29 @@ func add_little_guy_count(is_rare: bool = false) -> void:
 
 
 func get_little_guy_cost() -> int:
-	var purchases: float = float(little_guys_purchased)
-	var calculated_cost: float = (
+	var purchases = float(little_guys_purchased)
+
+	var calculated_cost = (
 		little_guy_base_cost
 		+ little_guy_linear_growth * purchases
-		+ little_guy_quadratic_growth * purchases * purchases
+		+ little_guy_quadratic_growth
+			* purchases
+			* purchases
 	)
 
-	return maxi(1, int(round(calculated_cost)))
+	# Reduces the final price by 0.02% per purchase.
+	# The reduction gradually increases but can never exceed 15%.
+	var gradual_discount = min(
+		purchases * 0.0002,
+		0.15
+	)
 
+	calculated_cost *= 1.0 - gradual_discount
+
+	return maxi(
+		1,
+		int(round(calculated_cost))
+	)
 
 func get_auto_buy_little_guy_cost() -> int:
 	return 0
@@ -345,18 +358,24 @@ func try_buy_little_guy(is_auto_buy: bool = false) -> bool:
 	if not can_buy_more_little_guys():
 		return false
 
-	# Manual purchases cost Ideas.
-	# Automatic purchases are completely free.
-	if not is_auto_buy:
-		var cost = get_little_guy_cost()
+	if is_auto_buy:
+		# Auto-buy is free and does not increase manual prices.
+		little_guy_purchased.emit()
+		costs_changed.emit()
+		return true
 
-		if not spend_ideas(cost):
-			return false
+	# Only manual purchases cost Ideas.
+	var cost := get_little_guy_cost()
 
+	if not spend_ideas(cost):
+		return false
+
+	# Only manual purchases increase future manual prices.
 	little_guys_purchased += 1
 
 	little_guy_purchased.emit()
 	costs_changed.emit()
+
 	return true
 
 

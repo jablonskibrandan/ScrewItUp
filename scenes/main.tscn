@@ -651,7 +651,7 @@ vertical_alignment = 1
 [node name="GameManager" type="Node" parent="." unique_id=335116798]
 script = ExtResource("2_0wfyh")
 little_guy_linear_growth = 1.5
-little_guy_quadratic_growth = 1.5
+little_guy_quadratic_growth = 0.5
 
 [node name="UIAudio" type="Node2D" parent="." unique_id=869765653]
 
